@@ -21,6 +21,7 @@
 
 ## 프로젝트 구조
 
+```plaintext
 📦kakao-talk
  ┣ 📂client
  ┃ ┣ 📂public

@@ -1,0 +1,46 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 환경 파일
+.env
+
+# 빌드 디렉터리
+dist/
+build/
+
+# 로그 파일
+*.log
+
+# OS/IDE 관련 파일
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Babel 관련 파일
+.babelrc
+babel.config.js
+
+# 서버 업로드 디렉터리
+server/uploads/
+
+# SSL 인증서
+*.crt
+*.key
+
+# TypeScript
+*.tsbuildinfo
+
+# 프로젝트 내 캐시 및 기타 임시 파일
+*.cache/
+*.tmp/
+*.swp
+
+# 테스트 결과 (예: Jest)
+coverage/
+
+# Swagger 파일 (필요시 추가)
+server/swagger/swagger-output.json

@@ -5,19 +5,49 @@
 
 ## 시작 가이드
 
+### 요구사항
+
+- Node.js 16.20.2
+- Npm 8.19.4
+
 ### 설치 및 실행
 
-- 프론트엔드 실행
+- 프론트엔드
 
   ```
+  $cd client
   $npm run start
   ```
 
-- 백엔드 실행
+- 백엔드
 
   ```
+  $cd server
   $npm run dev
   ```
+
+## 기술 스택
+<div align=center> 
+  <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black">
+  <img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"> 
+  <img src="https://img.shields.io/badge/recoil-3578E5?style=for-the-badge&logo=recoil&logoColor=white">
+  <img src="https://img.shields.io/badge/styledcomponents-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white">
+  <img src="https://img.shields.io/badge/reactquery-FF4154?style=for-the-badge&logo=reactquery&logoColor=white">
+  <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
+  <img src="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white">
+  <img src="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white">
+  <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
+  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
+  <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black">
+</div>
+
+## ERD (ERD Cloud)
+- https://www.erdcloud.com/d/rFyZbfuc4uZFQDGys
+  
+## API (Swagger)
+- (server path)/api-docs/
 
 ## 프로젝트 구조
 

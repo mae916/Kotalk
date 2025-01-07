@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Modal from '../components/Modal';
-import { useRecoilState } from 'recoil';
-import { userDataState } from '../recoil/auth/atom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { participantState, userDataState } from '../recoil/auth/atom';
 import { profileAxios } from '../api/upload';
 import { stateMsgAxios } from '../api/profile';
 import { getUserAxios } from '../api/auth';
-import { IUserAtom } from '../types';
+import { IUserAtom, ChatRoom } from '../types';
 import {
   addFriendAxios,
   getFriendsListAxios,
@@ -14,7 +14,8 @@ import {
 } from '../api/friends';
 import { useForm } from 'react-hook-form';
 import { handleClick, resizeImage } from '../utils';
-import ChattingRoom from './ChattingRoom';
+import ChattingRoom from '../components/ChattingRoom';
+import { createPersonalRoomAxios,getChatRoomInfoAxios } from '../api/chatting';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -350,7 +351,7 @@ function Friends() {
   const [searchUser, setSearchUser] = useState<any>(null);
   const [friends, setFriends] = useState<any>([]);
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
-  const [selectedChatId, setSelectedChatId] = useState<number>(0);
+  const setParticipant = useSetRecoilState<ChatRoom>(participantState);
 
   const {
     register,
@@ -454,9 +455,11 @@ function Friends() {
   function friendListClick(id: number) {
     setSelectedFriendId(id);
   }
-  function friendListDbClick(id: number) {
+  async function friendListDbClick(friendId: number) {
+    const { data: { room_id } } = await createPersonalRoomAxios(user.user_id, friendId);
+    const { data : roomInfo } = await getChatRoomInfoAxios(room_id);
+    setParticipant(roomInfo);
     handleOpenModal('chatting');
-    setSelectedChatId(id);
   }
 
   return (
@@ -636,7 +639,6 @@ function Friends() {
       )}
       {openModal === 'chatting' && (
         <ChattingRoom
-          id={selectedChatId}
           handleCloseModal={handleCloseModal}
         ></ChattingRoom>
       )}

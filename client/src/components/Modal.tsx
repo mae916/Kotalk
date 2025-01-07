@@ -10,9 +10,11 @@ const ModalContainer = styled.div`
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 5;
 `;
 
 const Content = styled.div`
+  z-index: 10;
   position: absolute;
   transform: translate(-50%, -50%);
   left: 50%;

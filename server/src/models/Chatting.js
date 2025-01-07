@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       room_id: DataTypes.INTEGER,
       message: DataTypes.STRING,
       del_yn: DataTypes.STRING(1),
+      send_date: DataTypes.DATE,
     },
     {
       sequelize,

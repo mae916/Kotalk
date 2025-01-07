@@ -5,6 +5,8 @@ import { loginAxios } from '../api/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { userDataState } from '../recoil/auth/atom';
+import { getSocket } from '../sockets/socket';
+import { useEffect, useState } from 'react';
 
 const LoginContainer = styled.div`
   position: relative;
@@ -116,8 +118,10 @@ const VerticalLine = styled.div`
   margin: 0 7px 0 10px;
   font-size: 0.65rem;
 `;
+
 function Login() {
   const setUserData = useSetRecoilState(userDataState);
+  const [socket, setSocket] = useState<any>(null);
   const navigate = useNavigate();
   const {
     register,
@@ -125,9 +129,15 @@ function Login() {
     formState: { isValid },
   } = useForm<IUser>();
 
+  useEffect(() => {
+    const newSocket = getSocket();
+    setSocket(newSocket);
+  }, []);
+
   async function loginHandler(data: any) {
     const datas = await loginAxios(data);
     setUserData(datas.data);
+    socket.emit('login_user', datas.data.user_id);
     navigate('/friends');
   }
 

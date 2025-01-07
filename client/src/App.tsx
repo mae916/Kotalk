@@ -1,7 +1,5 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import { io } from 'socket.io-client';
 import Router from './Router';
-import { useEffect } from 'react';
 import { initSocket } from './sockets/socket';
 
 const GlobalStyle = createGlobalStyle`
@@ -81,6 +79,8 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+  initSocket();
+
   return (
     <>
       <GlobalStyle></GlobalStyle>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getChattingListAxios } from '../api/chatting';
-import { userDataState } from '../recoil/auth/atom';
-import { useRecoilValue } from 'recoil';
+import { userDataState, participantState } from '../recoil/auth/atom';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { IUserAtom, ChatRoom } from '../types';
+import ChattingRoom from '../components/ChattingRoom';
+import { handleClick } from '../utils';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -46,17 +48,24 @@ const ContentBox = styled.ul`
   &::-webkit-scrollbar-track {
     background-color: rgba(0, 0, 0, 0); /* 스크롤바 뒷 배경을 투명 처리한다 */
   }
+`;
 
-  & > li {
-    display: flex;
-    align-items: center;
+const RoomList = styled.li<{ $isSelected: boolean }>`
+  display: flex;
+  align-items: center;
+  margin-left: -17px;
+  padding: 7px 7px 7px 17px;
+  background-color: ${(props) =>
+    props.$isSelected ? '#ededed' : 'transparent'};
+  &:hover {
+    background-color: #f5f5f5;
   }
 `;
 
 const ImgBox = styled.div<{ $length: number }>`
   width: 45px;
   height: 45px;
-  margin-right:12px;
+  margin-right: 12px;
   & > img {
     border: 1px solid #e9e9e9;
   }
@@ -139,27 +148,31 @@ const ImgBox = styled.div<{ $length: number }>`
     `}
 `;
 const TextBox = styled.div`
-  max-width:80%;
+  max-width: 80%;
 `;
 const LeftBox = styled.div``;
-const Title = styled.div`
-`;
+const Title = styled.div``;
 const Names = styled.span`
   font-size: 0.7rem;
   font-weight: 600;
-  margin-right:4px;
-  `;
+  margin-right: 4px;
+`;
 const Count = styled.span`
- font-weight: 300;
- font-size: 0.7rem;
- color: #b2b0af;
+  font-weight: 300;
+  font-size: 0.7rem;
+  color: #b2b0af;
 `;
 const LastMsg = styled.span``;
 const LastMsgDate = styled.span``;
 
 function ChatList() {
   const user = useRecoilValue<IUserAtom>(userDataState);
+  const setParticipant = useSetRecoilState<ChatRoom>(participantState);
+
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const [selectedId, setSelectedId] = useState<number>(0);
+  const [openModal, setOpenModal] = useState<string | null>(null);
+
   useEffect(() => {
     (async () => {
       await getChattingList();
@@ -169,11 +182,32 @@ function ChatList() {
   async function getChattingList() {
     try {
       const { data } = await getChattingListAxios(user.user_id);
-      console.log('data', data);
       setRooms(data);
     } catch (error) {
       console.error('채팅 리스트 조회 실패:', error);
     }
+  }
+
+  function handleOpenModal(modalType: string) {
+    setOpenModal(modalType); // 특정 모달 열기
+  }
+
+  function handleCloseModal() {
+    setOpenModal(null); // 모든 모달 닫기
+  }
+
+  function roomListClick(id: number) {
+    setSelectedId(id);
+  }
+
+  function roomListDbClick(id: number) {
+    handleOpenModal('room');
+    setSelectedId(id);
+    rooms.forEach((room) => {
+      if (room.room_id === id) {
+        setParticipant(room);
+      }
+    });
   }
 
   return (
@@ -191,7 +225,17 @@ function ChatList() {
       </TitleBox>
       <ContentBox>
         {rooms.map((room) => (
-          <li key={room.room_id}>
+          <RoomList
+            key={room.room_id}
+            $isSelected={selectedId === room.room_id}
+            onClick={(e) =>
+              handleClick(
+                e,
+                () => roomListClick(room.room_id),
+                () => roomListDbClick(room.room_id)
+              )
+            }
+          >
             <ImgBox $length={room.images.length}>
               {room.images.map((img, i) => (
                 <img key={i} src={img} alt="" />
@@ -201,19 +245,25 @@ function ChatList() {
               <LeftBox>
                 <Title>
                   <Names>
-                    {room.names.map((name, j) =>
+                    {/* {room.names.map((name, j) =>
                       j >= 0 && j >= room.names.length - 1 ? name : name + ','
-                    )}
+                    )} */}
+                    {room.room_name}
                   </Names>
-                  <Count>{room.names.length > 2 && room.names.length + 1}</Count>
+                  <Count>
+                    {room.images.length > 2 && room.images.length + 1}
+                  </Count>
                 </Title>
                 <LastMsg>{room.last_message}</LastMsg>
               </LeftBox>
               <LastMsgDate>{room.last_message_created_at}</LastMsgDate>
             </TextBox>
-          </li>
+          </RoomList>
         ))}
       </ContentBox>
+      {openModal === 'room' && (
+        <ChattingRoom handleCloseModal={handleCloseModal}></ChattingRoom>
+      )}
     </Container>
   );
 }

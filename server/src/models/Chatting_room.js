@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true, // 기본 키로 설정
         autoIncrement: true, // 자동 증가 옵션이 필요하다면 추가
       },
+      type: DataTypes.STRING(20),
+      room_name: DataTypes.STRING(200),
       last_message: DataTypes.STRING(200),
       last_message_created_at: DataTypes.DATE,
     },

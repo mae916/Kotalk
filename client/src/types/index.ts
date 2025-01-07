@@ -27,4 +27,6 @@ export interface ChatRoom {
   last_message_created_at: string | null; // 마지막 메시지 생성 시간
   images: string[]; // 참여자의 프로필 이미지 URL 목록
   names: string[]; // 참여자 이름 목록
+  ids: number[]; // 참여자 아이디 목록
+  room_name: string; // 방이름
 }

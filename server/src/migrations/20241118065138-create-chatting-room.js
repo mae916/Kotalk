@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      type: {
+        type: Sequelize.STRING(20),
+      },
       last_message: {
         type: Sequelize.STRING(100),
       },

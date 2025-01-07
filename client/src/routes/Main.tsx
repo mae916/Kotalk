@@ -4,6 +4,10 @@ import { Routes, Route } from 'react-router-dom';
 import Friends from './Friends';
 import ChatList from './ChatList';
 import Banner from '../components/Banner';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { participantState } from '../recoil/auth/atom';
+import { getSocket } from '../sockets/socket';
 
 const MainContainer = styled.div``;
 
@@ -28,6 +32,56 @@ const RouteBox = styled.div`
 `;
 
 function Main() {
+  const [socket, setSocket] = useState<any>(null);
+  const [participant, setParticipant] = useRecoilState(participantState);
+  const [localMsg, setLocalMsg] = useState<any>([]);
+  const [msgList, setMsgList] = useState<any>([]);
+
+  function addMessage(user: any, roomId:number, message: any) {
+    console.log('addMessage',user);
+    const obj = {
+      message: message,
+      send_date: new Date().toISOString(),
+      del_yn: 'n',
+      room_id: roomId,
+      user_id: user.user_id,
+      profile_img_url: user.profile_img_url,
+      user_name: user.user_name,
+    };
+    console.log('obj', obj);
+    setLocalMsg((prev: any[] = []) => [...prev, { ...obj }]);
+    setMsgList((prev: any[] = []) => {
+      const data = [...prev, { ...obj }];
+      console.log('data', data);
+      return data;
+    });
+  }
+
+  useEffect(() => {
+    const newSocket = getSocket();
+    setSocket(newSocket);
+
+    return () => {
+      if (socket) {
+        socket.off('receive_msg', addMessage);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socket && participant) {
+      // 채팅방 입장
+      // socket.emit('enter_personal_room', roomTitle, participant.ids);
+      //메시지 받기
+      socket.on('receive_msg', addMessage);
+
+      // 기존 이벤트 리스너 제거
+      return () => {
+        socket.off('receive_msg', addMessage);
+      };
+    }
+  }, [socket]);
+
   return (
     <MainContainer>
       <Inner>

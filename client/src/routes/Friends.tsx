@@ -15,7 +15,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { handleClick, resizeImage } from '../utils';
 import ChattingRoom from '../components/ChattingRoom';
-import { createPersonalRoomAxios,getChatRoomInfoAxios } from '../api/chatting';
+import { createPersonalRoomAxios, getChatRoomInfoAxios } from '../api/chatting';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -456,8 +456,13 @@ function Friends() {
     setSelectedFriendId(id);
   }
   async function friendListDbClick(friendId: number) {
-    const { data: { room_id } } = await createPersonalRoomAxios(user.user_id, friendId);
-    const { data : roomInfo } = await getChatRoomInfoAxios(room_id);
+    const {
+      data: { room_id },
+    } = await createPersonalRoomAxios(user.user_id, friendId);
+    const { data: roomInfo } = await getChatRoomInfoAxios(
+      user.user_id,
+      room_id
+    );
     setParticipant(roomInfo);
     handleOpenModal('chatting');
   }
@@ -638,9 +643,7 @@ function Friends() {
         </Modal>
       )}
       {openModal === 'chatting' && (
-        <ChattingRoom
-          handleCloseModal={handleCloseModal}
-        ></ChattingRoom>
+        <ChattingRoom handleCloseModal={handleCloseModal}></ChattingRoom>
       )}
     </Container>
   );

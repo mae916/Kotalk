@@ -5,7 +5,7 @@ import { IUser } from '../types';
 export async function loginAxios(userData: IUser) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/auth/login',
+      `${process.env.REACT_APP_API_URL}/auth/login`,
       userData,
       {
         headers: {
@@ -27,7 +27,7 @@ export async function loginAxios(userData: IUser) {
 export async function joinAxios(userData: IUser) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/auth/join',
+      `${process.env.REACT_APP_API_URL}/auth/join`,
       userData,
       {
         headers: {
@@ -47,7 +47,7 @@ export async function joinAxios(userData: IUser) {
 // 유저 정보 조회
 export async function getUserAxios(accessToken: string) {
   try {
-    const response = await axios.get('https://localhost:4000/auth/getUser', {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/getUser`, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // 토큰 포함
       },

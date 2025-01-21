@@ -5,10 +5,11 @@ import Friends from './Friends';
 import ChatList from './ChatList';
 import Banner from '../components/Banner';
 import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { participantState } from '../recoil/auth/atom';
 import { getSocket } from '../sockets/socket';
-
+import { getReadNotCountAxios } from '../api/chatting';
+import { useRecoilValue } from 'recoil';
+import { userDataState } from '../recoil/auth/atom';
+import { IUserAtom } from '../types';
 const MainContainer = styled.div``;
 
 const Inner = styled.div`
@@ -32,60 +33,39 @@ const RouteBox = styled.div`
 `;
 
 function Main() {
-  const [socket, setSocket] = useState<any>(null);
-  const [participant, setParticipant] = useRecoilState(participantState);
-  const [localMsg, setLocalMsg] = useState<any>([]);
-  const [msgList, setMsgList] = useState<any>([]);
+  const [socket, setSocket] = useState<any>();
+  const [readNotCount, setReadNotCount] = useState<number>(0); // 메시지 읽지 않은 수
+  const user = useRecoilValue<IUserAtom>(userDataState);
 
-  function addMessage(user: any, roomId:number, message: any) {
-    console.log('addMessage',user);
-    const obj = {
-      message: message,
-      send_date: new Date().toISOString(),
-      del_yn: 'n',
-      room_id: roomId,
-      user_id: user.user_id,
-      profile_img_url: user.profile_img_url,
-      user_name: user.user_name,
-    };
-    console.log('obj', obj);
-    setLocalMsg((prev: any[] = []) => [...prev, { ...obj }]);
-    setMsgList((prev: any[] = []) => {
-      const data = [...prev, { ...obj }];
-      console.log('data', data);
-      return data;
+  if (socket) {
+    socket.on('receive_msg', () => {
+      console.log('Main receive_msg');
+      setTimeout(getReadNotCount, 100);
+    });
+
+    socket.on('read_count_apply', () => {
+      setTimeout(getReadNotCount, 100);
     });
   }
 
   useEffect(() => {
-    const newSocket = getSocket();
-    setSocket(newSocket);
+    if (!socket) {
+      const socketInstance = getSocket(); // 처음에만 생성
+      setSocket(socketInstance);
+    }
 
-    return () => {
-      if (socket) {
-        socket.off('receive_msg', addMessage);
-      }
-    };
+    getReadNotCount();
   }, []);
 
-  useEffect(() => {
-    if (socket && participant) {
-      // 채팅방 입장
-      // socket.emit('enter_personal_room', roomTitle, participant.ids);
-      //메시지 받기
-      socket.on('receive_msg', addMessage);
-
-      // 기존 이벤트 리스너 제거
-      return () => {
-        socket.off('receive_msg', addMessage);
-      };
-    }
-  }, [socket]);
+  async function getReadNotCount() {
+    const result = await getReadNotCountAxios(user.user_id);
+    setReadNotCount(Number(result.data.total_read_n_count));
+  }
 
   return (
     <MainContainer>
       <Inner>
-        <SideMenu></SideMenu>
+        <SideMenu readNotCount={readNotCount}></SideMenu>
         <ContentBox>
           <CloseBox>
             <i className="xi-minus-thin"></i>

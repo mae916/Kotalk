@@ -4,7 +4,7 @@ let socket: any = null;
 
 export const initSocket = () => {
   if (!socket) {
-    socket = io('https://localhost:4000');
+    socket = io(`${process.env.REACT_APP_API_URL}`);
     socket.on('connect', () => {
       console.log('socket connect');
     });
@@ -12,7 +12,7 @@ export const initSocket = () => {
       console.log('socket disconnect');
     });
   }
-  return null;
+  return socket;
 };
 
 export const getSocket = () => {

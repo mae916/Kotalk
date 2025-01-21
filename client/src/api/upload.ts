@@ -3,7 +3,7 @@ import axios from 'axios';
 export async function profileAxios(formData: any) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/upload/profile',
+      `${process.env.REACT_APP_API_URL}/upload/profile`,
       formData,
       {
         headers: {

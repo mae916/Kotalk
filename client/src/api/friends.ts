@@ -4,7 +4,7 @@ import axios from 'axios';
 export async function searchUserAxios(keyword: string) {
   try {
     const response = await axios.get(
-      'https://localhost:4000/friends/searchUser',
+      `${process.env.REACT_APP_API_URL}/friends/searchUser`,
       {
         params: {
           keyword, // 서버에 보낼 매개변수
@@ -23,7 +23,7 @@ export async function searchUserAxios(keyword: string) {
 export async function addFriendAxios(userData: any) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/friends/addFriend',
+      `${process.env.REACT_APP_API_URL}/friends/addFriend`,
       userData,
       {
         headers: {
@@ -44,7 +44,7 @@ export async function addFriendAxios(userData: any) {
 export async function getFriendInfoAxios(userData: any) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/friends/getFriendInfo',
+      `${process.env.REACT_APP_API_URL}/friends/getFriendInfo`,
       userData,
       {
         headers: {
@@ -65,7 +65,7 @@ export async function getFriendInfoAxios(userData: any) {
 export async function getFriendsListAxios(userId: number) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/friends/getFriendsList',
+      `${process.env.REACT_APP_API_URL}/friends/getFriendsList`,
       { userId },
       {
         headers: {

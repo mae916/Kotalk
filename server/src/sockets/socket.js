@@ -1,6 +1,17 @@
 import {
-  getRoomNameList
+  getRoomNameList,
+  updateReadUser,
 } from '../controllers/socketController';
+
+// 특정 유저가 특정 방에 있는지 확인하는 함수
+function isUserInRoom(io, socketId, roomName) {
+  const room = io.sockets.adapter.rooms.get(roomName);
+  if (!room) {
+    console.log('방 자체가 존재하지 않음');
+    return false; // 방 자체가 존재하지 않음
+  }
+  return room.has(socketId); // 소켓 ID가 방에 존재하는지 확인
+}
 
 function initSocket(io) {
   const userSocketMap = new Map(); // userId와 socketId 매핑
@@ -10,68 +21,60 @@ function initSocket(io) {
 
     // 유저 로그인 (유저정보저장, 채팅방 자동 join)
     socket.on('login_user', async (userId) => {
-
-      // 유저정보 저장
       userSocketMap.set(userId, socket);
-      socket.data.userId = userId; // 소켓 데이터에 저장
+      socket.data.userId = userId;
       console.log(`User registered: ${userId}`);
 
-      //채팅방 자동 join
       const roomNames = await getRoomNameList(userId);
 
       roomNames.forEach((roomName) => {
         const targetSocket = userSocketMap.get(userId);
-        targetSocket.join(roomName);
-        console.log(roomName);
+        if (!isUserInRoom(io, targetSocket.id, roomName)) {
+          targetSocket.join(roomName);
+          console.log(`User ${userId} joined room: ${roomName}`);
+        }
       });
     });
 
-    // 개인채팅방 입장
-    // socket.on('enter_personal_room', (roomName, targetIds) => {
-    //   if (!targetIds || targetIds.length === 0) {
-    //     console.error('No target IDs provided');
-    //     return; // targetIds가 없으면 처리를 멈춤
-    //   }
-
-    //   targetIds.forEach((id) => {
-    //     console.log('id',id);
-    //     const targetSocket = userSocketMap.get(id);
-    //     console.log('targetSocket',targetSocket)
-    //     if (!targetSocket) {
-    //       console.error(`User ${id} is not connected`);
-    //       return; // 연결된 소켓이 없다면 해당 유저는 방에 입장하지 않도록 처리
-    //     }
-
-    //     // 방에 해당 유저 추가
-    //     targetSocket.join(roomName);
-    //     console.log(`User ${id} joined room: ${roomName}`);
-    //   });
-      
-
-    //   // socket.data.user_id = userData.userId;
-
-    //   // io.to(roomTitle).emit('getTargetRoomInfo', roomData, msgData);
-    // });
-
-    //그룹 채팅방
-    socket.on('enter_group_room', (userData) => {});
-
-    //메시지 보내고 보여주기
+    // 메시지 보내기
     socket.on('send_msg', (user, roomName, message) => {
-      const roomId = roomName.match(/\d+/)[0]; // roomName에서 roomId 추출
-      io.to(roomName).emit('receive_msg', user, roomId, message);
-      // setChatMessage(user, msg);
+      console.log('send_msg');
+      const targetSocket = userSocketMap.get(user.user_id);
+
+      // 해당 room에 참여 여부 확인
+      if (!isUserInRoom(io, targetSocket.id, roomName)) {
+        console.log(
+          `User ${user.user_id} is not in room ${roomName}, joining room`
+        );
+        targetSocket.join(roomName); // 방에 참가
+      }
+
+      io.to(roomName).emit('receive_msg', user, message); // 메시지 전송
+      console.log(`Message sent to room ${roomName}: ${message}`);
+
+      const room = io.sockets.adapter.rooms.get(roomName);
+      console.log('roomroom', room);
+    });
+
+    // 메시지 읽음 처리
+    socket.on('read_message', (room_id, roomName, user_id) => {
+      updateReadUser(room_id, user_id);
+      io.to(roomName).emit('read_count_apply', user_id);
+    });
+
+    // 메시지 삭제 처리
+    socket.on('del_message', (roomName, chat_id) => {
+      io.to(roomName).emit('del_message_apply', chat_id);
     });
 
     // 방 나가기
     socket.on('leave_room', (roomName) => {
-      // socket.leave(roomName);
+      socket.leave(roomName);
     });
-    
 
     // 연결 해제
     socket.on('disconnect', () => {
-
+      console.log('A user disconnected:', socket.id);
     });
   });
 }

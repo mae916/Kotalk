@@ -4,20 +4,38 @@
     "password": "dhlrPdls!@",
     "database": "kakaotalk",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Seoul",
+    "dialectOptions": {
+      "charset": "utf8mb4",
+      "dateStrings": true,
+      "typeCast": true
+    }
   },
   "test": {
     "username": "root",
     "password": "dhlrPdls!@",
     "database": "kakaotalk",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Seoul",
+    "dialectOptions": {
+      "charset": "utf8mb4",
+      "dateStrings": true,
+      "typeCast": true
+    }
   },
   "production": {
     "username": "root",
     "password": "dhlrPdls!@",
     "database": "kakaotalk",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Seoul",
+    "dialectOptions": {
+      "charset": "utf8mb4",
+      "dateStrings": true,
+      "typeCast": true
+    }
   }
 }

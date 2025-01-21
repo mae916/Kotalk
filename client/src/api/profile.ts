@@ -3,7 +3,7 @@ import axios from 'axios';
 export async function stateMsgAxios(userData: any) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/profile/setStateMsg',
+      `${process.env.REACT_APP_API_URL}/profile/setStateMsg`,
       userData,
       {
         headers: {

@@ -33,12 +33,11 @@ export async function getRoomNameList(userId) {
   );
 
   const names = rooms.map((room) => {
-    return `${room.room_name}_${room.room_id}`
-  })
+    return `${room.room_name}_${room.room_id}`;
+  });
 
   return names;
 }
-
 
 // 그룹채팅방 생성
 export async function createGroupRoom(userData) {
@@ -105,3 +104,21 @@ export async function getRoomInfo(roomId) {
 
 // 채팅방 입장
 export async function enterRoom() {}
+
+//메시지 읽은 유저 업데이트
+export async function updateReadUser(room_id, user_id) {
+  const isExisting = await db.Msg_read_user.findAll({
+    where: { room_id, user_id },
+    attributes: ['read_yn'], // 필요한 필드만 가져옴
+  });
+
+  if (isExisting && isExisting.read_yn !== 'y') {
+    await db.Msg_read_user.update(
+      { read_yn: 'y' },
+      { where: { room_id, user_id } }
+    );
+    console.log('읽은 유저 업데이트 완료!');
+  } else {
+    console.log('읽은 유저 이미 업데이트 되었음.');
+  }
+}

@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      room_name: {
+        type: Sequelize.STRING(100),
+      },
       type: {
         type: Sequelize.STRING(20),
       },

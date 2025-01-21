@@ -29,4 +29,5 @@ export interface ChatRoom {
   names: string[]; // 참여자 이름 목록
   ids: number[]; // 참여자 아이디 목록
   room_name: string; // 방이름
+  read_n_count: number; // 읽지않은 메시지의 수
 }

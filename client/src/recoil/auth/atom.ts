@@ -25,5 +25,6 @@ export const participantState = atom<ChatRoom>({
     room_id: 0,
     ids: [],
     room_name: '',
+    read_n_count: 0,
   },
 });

@@ -11,13 +11,27 @@ const SideMenuContainer = styled.ul`
     justify-content: center;
     align-items: center;
     height: 50px;
+    position: relative;
     & i {
       font-size: 1.5rem;
     }
   }
 `;
 
-function SideMenu() {
+const Count = styled.div`
+  position: absolute;
+  right: 5px;
+  bottom: 10px;
+  background-color: #f4551e;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  width: 0.9rem;
+  text-align: center;
+  padding: 2px 0;
+`;
+
+function SideMenu({ readNotCount }: { readNotCount: number }) {
   const location = useLocation();
   const isFriendsPage = location.pathname === '/friends';
   const isChatListPage = location.pathname === '/chatList';
@@ -49,6 +63,7 @@ function SideMenu() {
             <i className="xi-speech" style={{ color: '#c9c9c9' }}></i>
           )}
         </Link>
+        {readNotCount > 0 && <Count>{readNotCount}</Count>}
       </li>
       <li>
         <Link

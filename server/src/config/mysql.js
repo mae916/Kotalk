@@ -9,6 +9,8 @@ const database = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  timezone: "Asia/Seoul",
+  dateStrings:true
 });
 
 // database.connect((err) => {

@@ -6,6 +6,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { IUserAtom, ChatRoom } from '../types';
 import ChattingRoom from '../components/ChattingRoom';
 import { handleClick } from '../utils';
+import { getSocket } from '../sockets/socket';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -53,6 +54,7 @@ const ContentBox = styled.ul`
 const RoomList = styled.li<{ $isSelected: boolean }>`
   display: flex;
   align-items: center;
+  width: calc(100% + 17px);
   margin-left: -17px;
   padding: 7px 7px 7px 17px;
   background-color: ${(props) =>
@@ -148,7 +150,9 @@ const ImgBox = styled.div<{ $length: number }>`
     `}
 `;
 const TextBox = styled.div`
-  max-width: 80%;
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
 `;
 const LeftBox = styled.div``;
 const Title = styled.div``;
@@ -162,27 +166,80 @@ const Count = styled.span`
   font-size: 0.7rem;
   color: #b2b0af;
 `;
-const LastMsg = styled.span``;
-const LastMsgDate = styled.span``;
+const LastMsg = styled.span`
+  margin-top: 2px;
+  font-size: 0.6rem;
+  color: #767676;
+  width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 0.7rem;
+`;
+const DateBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: space-between;
+`;
+const LastMsgDate = styled.span`
+  font-size: 0.6rem;
+  color: #767676;
+`;
+const ReadNotCount = styled.div<{ $isCount: boolean }>`
+  font-size: 0.7rem;
+  border-radius: 50%;
+  width: 0.9rem;
+  padding: 2px 0;
+  text-align: center;
+  font-weight: 600;
+  color: transparent;
+  margin-top: 7px;
+  ${({ $isCount }) =>
+    $isCount &&
+    `
+     background-color: #ff7a6b;
+     color: #fff;
+  `}
+`;
 
 function ChatList() {
   const user = useRecoilValue<IUserAtom>(userDataState);
   const setParticipant = useSetRecoilState<ChatRoom>(participantState);
-
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [selectedId, setSelectedId] = useState<number>(0);
   const [openModal, setOpenModal] = useState<string | null>(null);
+  const [socket, setSocket] = useState<any>();
 
   useEffect(() => {
-    (async () => {
-      await getChattingList();
-    })();
-  }, []);
+    if (!socket) {
+      const socketInstance = getSocket(); // 처음에만 생성
+      setSocket(socketInstance);
+    }
+    getChattingList();
+    if (socket) {
+      socket.on('receive_msg', () => {
+        console.log('chartList receive_msg');
+        setTimeout(getChattingList, 200);
+      });
+
+      socket.on('read_count_apply', () => {
+        console.log('chartList read_count_apply');
+        setTimeout(getChattingList, 200);
+      });
+    }
+  }, [socket, openModal]);
 
   async function getChattingList() {
     try {
+      console.log('chartList getChattingList', user.user_id);
       const { data } = await getChattingListAxios(user.user_id);
-      setRooms(data);
+      if (data) {
+        setRooms(data);
+        console.log('data', data);
+      }
     } catch (error) {
       console.error('채팅 리스트 조회 실패:', error);
     }
@@ -256,7 +313,12 @@ function ChatList() {
                 </Title>
                 <LastMsg>{room.last_message}</LastMsg>
               </LeftBox>
-              <LastMsgDate>{room.last_message_created_at}</LastMsgDate>
+              <DateBox>
+                <LastMsgDate>{room.last_message_created_at}</LastMsgDate>
+                <ReadNotCount $isCount={room.read_n_count ? true : false}>
+                  {room.read_n_count}
+                </ReadNotCount>
+              </DateBox>
             </TextBox>
           </RoomList>
         ))}

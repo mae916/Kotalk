@@ -82,7 +82,7 @@ export async function getFriendsList(req, res) {
 
   try {
     const [result] = await database.query(
-      'SELECT friends.friend_id, friends.user_id, friends.friend_name, profile.profile_img_url, profile.bg_img_url, profile.state_msg FROM friends LEFT JOIN profile ON friends.friend_id = profile.user_id LEFT JOIN account ON friends.friend_id = account.user_id WHERE friends.user_id = ?',
+      'SELECT friends.id,friends.friend_id, friends.user_id, friends.friend_name, profile.profile_img_url, profile.bg_img_url, profile.state_msg FROM friends LEFT JOIN profile ON friends.friend_id = profile.user_id LEFT JOIN account ON friends.friend_id = account.user_id WHERE friends.user_id = ?',
       [userId]
     );
 

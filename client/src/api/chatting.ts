@@ -4,7 +4,7 @@ import axios from 'axios';
 export async function getChattingListAxios(userId: number) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/chatting/getChattingList',
+      `${process.env.REACT_APP_API_URL}/chatting/getChattingList`,
       { userId },
       {
         headers: {
@@ -22,11 +22,11 @@ export async function getChattingListAxios(userId: number) {
 }
 
 // 채팅방 정보 조회
-export async function getChatRoomInfoAxios(roomId: number) {
+export async function getChatRoomInfoAxios(userId: number, roomId: number) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/chatting/getChatRoomInfo',
-      { roomId },
+      `${process.env.REACT_APP_API_URL}/chatting/getChatRoomInfo`,
+      { userId, roomId },
       {
         headers: {
           'Content-Type': 'application/json', // JSON 형식으로 보내기
@@ -49,7 +49,7 @@ export async function createPersonalRoomAxios(
 ) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/chatting/createPersonalRoom',
+      `${process.env.REACT_APP_API_URL}/chatting/createPersonalRoom`,
       { userId, friendId },
       {
         headers: {
@@ -67,14 +67,19 @@ export async function createPersonalRoomAxios(
 }
 
 // 채팅 내용 조회
-export async function getMsgListAxios(roomId: number) {
+export async function getMsgListAxios(
+  roomId: number,
+  pageSize: number,
+  lastId: number | null
+) {
   try {
-    const response = await axios.post(
-      'https://localhost:4000/chatting/getMsgList',
-      { roomId },
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/chatting/getMsgList`,
       {
-        headers: {
-          'Content-Type': 'application/json', // JSON 형식으로 보내기
+        params: {
+          roomId,
+          pageSize,
+          lastId,
         },
       }
     );
@@ -88,11 +93,11 @@ export async function getMsgListAxios(roomId: number) {
 }
 
 // 채팅 메시지 저장
-export async function setChatMessageAxios(msgList: any) {
+export async function setChatMessageAxios(msg: any) {
   try {
     const response = await axios.post(
-      'https://localhost:4000/chatting/setChatMessage',
-      { msgList },
+      `${process.env.REACT_APP_API_URL}/chatting/setChatMessage`,
+      { msg },
       {
         headers: {
           'Content-Type': 'application/json', // JSON 형식으로 보내기
@@ -105,5 +110,47 @@ export async function setChatMessageAxios(msgList: any) {
   } catch (error) {
     console.error('채팅 메시지 저장 실패:', error);
     throw new Error('채팅 메시지 저장을 실패했습니다.');
+  }
+}
+
+// 읽지 않은 전체 메시지 수 조회
+export async function getReadNotCountAxios(userId: any) {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/chatting/getReadNotCount`,
+      { userId },
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식으로 보내기
+        },
+      }
+    );
+
+    // 서버에서 받은 유저 정보 반환
+    return response.data;
+  } catch (error) {
+    console.error('읽지 않은 전체 메시지 수 조회 실패:', error);
+    throw new Error('읽지 않은 전체 메시지 수 조회를 실패 했습니다.');
+  }
+}
+
+// 채팅 메시지 삭제
+export async function setDeleteMessageAxios(msg: any) {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/chatting/setDeleteMessage`,
+      { msg },
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식으로 보내기
+        },
+      }
+    );
+
+    // 서버에서 받은 유저 정보 반환
+    return response.data;
+  } catch (error) {
+    console.error('채팅 메시지 삭제 실패:', error);
+    throw new Error('채팅 메시지 삭제를 실패 했습니다.');
   }
 }

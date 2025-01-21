@@ -5,6 +5,8 @@ import {
   getChatRoomInfo,
   getMsgList,
   setChatMessage,
+  getReadNotCount,
+  setDeleteMessage,
 } from '../controllers/chattingController';
 
 const chattingRouter = Router();
@@ -19,8 +21,12 @@ chattingRouter.post('/getChatRoomInfo', getChatRoomInfo);
 chattingRouter.post('/createPersonalRoom', createPersonalRoom);
 
 //메시지 리스트 조회
-chattingRouter.post('/getMsgList', getMsgList);
+chattingRouter.get('/getMsgList', getMsgList);
 
 chattingRouter.post('/setChatMessage', setChatMessage);
+
+chattingRouter.post('/getReadNotCount', getReadNotCount);
+
+chattingRouter.post('/setDeleteMessage', setDeleteMessage);
 
 export default chattingRouter;

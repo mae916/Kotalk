@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: 'https://localhost:4000', // 요청 URL
+        url: `${process.env.REACT_APP_API_URL}`, // 요청 URL
       },
     ],
   },

@@ -21,9 +21,6 @@ module.exports = {
       del_yn: {
         type: Sequelize.STRING(1),
       },
-      send_date: {
-        type: Sequelize.DATE,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

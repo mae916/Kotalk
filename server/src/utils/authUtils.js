@@ -1,7 +1,4 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 // 비밀키와 만료 시간은 환경 변수에서 가져옴
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;

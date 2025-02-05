@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # 환경 파일
-.env
+.env*
 
 # 빌드 디렉터리
 dist/
@@ -26,6 +26,9 @@ babel.config.js
 
 # 서버 업로드 디렉터리
 server/uploads/
+
+# mysql config 파일
+server/config/config.json
 
 # SSL 인증서
 *.crt

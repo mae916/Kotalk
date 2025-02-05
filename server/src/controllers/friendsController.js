@@ -1,5 +1,5 @@
-import db from '../models';
-import database from '../config/mysql';
+import db from '../../models';
+import database from '../../config/mysql';
 
 // 친구 추가를 위한 유저 조회
 export async function searchUser(req, res) {

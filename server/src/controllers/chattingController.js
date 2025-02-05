@@ -1,5 +1,5 @@
-import db from '../models';
-import database from '../config/mysql';
+import db from '../../models';
+import database from '../../config/mysql';
 import { formatDate } from '../utils/dateUtil';
 
 // 메시지 삭제

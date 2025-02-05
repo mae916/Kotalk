@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: `${process.env.REACT_APP_API_URL}`, // 요청 URL
+        url: 'http://13.124.246.237:8000', // 요청 URL
       },
     ],
   },

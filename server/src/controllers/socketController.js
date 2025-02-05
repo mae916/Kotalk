@@ -1,5 +1,5 @@
-import db from '../models';
-import database from '../config/mysql';
+import db from '../../models';
+import database from '../../config/mysql';
 import { Op } from 'sequelize';
 
 // 개인 채팅방 입장

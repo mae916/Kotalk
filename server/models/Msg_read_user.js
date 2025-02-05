@@ -1,7 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class msg_read_user extends Model {
+  class Msg_read_user extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  msg_read_user.init(
+  Msg_read_user.init(
     {
       chat_id: DataTypes.INTEGER,
       user_id: DataTypes.INTEGER,
@@ -25,5 +25,5 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  return msg_read_user;
+  return Msg_read_user;
 };

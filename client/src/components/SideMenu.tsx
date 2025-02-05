@@ -65,7 +65,7 @@ function SideMenu({ readNotCount }: { readNotCount: number }) {
         </Link>
         {readNotCount > 0 && <Count>{readNotCount}</Count>}
       </li>
-      <li>
+      {/* <li>
         <Link
           to={{
             pathname: `/more`,
@@ -77,7 +77,7 @@ function SideMenu({ readNotCount }: { readNotCount: number }) {
             <i className="xi-ellipsis-h" style={{ color: '#c9c9c9' }}></i>
           )}
         </Link>
-      </li>
+      </li> */}
     </SideMenuContainer>
   );
 }

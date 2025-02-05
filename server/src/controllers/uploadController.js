@@ -1,4 +1,4 @@
-import db from '../models';
+import db from '../../models';
 // import database from '../config/mysql';
 
 // 프로필 변경

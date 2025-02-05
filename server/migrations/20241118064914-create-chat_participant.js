@@ -2,27 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Friends', {
+    await queryInterface.createTable('chat_participant', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      room_id: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       user_id: {
+        allowNull: false,
         type: Sequelize.INTEGER,
       },
       friend_id: {
+        allowNull: false,
         type: Sequelize.INTEGER,
-      },
-      friend_name: {
-        type: Sequelize.STRING(100),
-      },
-      hidden_yn: {
-        type: Sequelize.STRING(1),
-      },
-      block_yn: {
-        type: Sequelize.STRING(1),
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Friends');
+    await queryInterface.dropTable('chat_participant');
   },
 };

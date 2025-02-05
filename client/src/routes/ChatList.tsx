@@ -31,7 +31,7 @@ const ContentBox = styled.ul`
   overflow-x: hidden;
   margin-left: -17px;
   padding-left: 17px;
-  height: 514px;
+  height: 508px;
 
   &::-webkit-scrollbar {
     width: 14px; /* 세로 스크롤바 폭 */
@@ -271,14 +271,14 @@ function ChatList() {
     <Container>
       <TitleBox>
         <h1>채팅</h1>
-        <TopMenu>
+        {/* <TopMenu>
           <li>
             <i className="xi-search"></i>
           </li>
           <li>
             <i className="xi-message-o"></i>
           </li>
-        </TopMenu>
+        </TopMenu> */}
       </TitleBox>
       <ContentBox>
         {rooms.map((room) => (

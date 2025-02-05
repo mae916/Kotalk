@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import SideMenu from '../components/SideMenu';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import Friends from './Friends';
 import ChatList from './ChatList';
 import Banner from '../components/Banner';
@@ -20,7 +20,7 @@ const ContentBox = styled.div``;
 const CloseBox = styled.div`
   display: flex;
   justify-content: right;
-  margin: 10px 10px 15px;
+  margin: 30px 10px 15px;
   & > i:first-child {
     margin-right: 8px;
   }
@@ -36,6 +36,12 @@ function Main() {
   const [socket, setSocket] = useState<any>();
   const [readNotCount, setReadNotCount] = useState<number>(0); // 메시지 읽지 않은 수
   const user = useRecoilValue<IUserAtom>(userDataState);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if(location.pathname === '/') {
+    navigate('/login');
+  }
 
   if (socket) {
     socket.on('receive_msg', () => {
@@ -68,8 +74,8 @@ function Main() {
         <SideMenu readNotCount={readNotCount}></SideMenu>
         <ContentBox>
           <CloseBox>
-            <i className="xi-minus-thin"></i>
-            <i className="xi-close-thin"></i>
+            {/* <i className="xi-minus-thin"></i>
+            <i className="xi-close-thin"></i> */}
           </CloseBox>
           <RouteBox>
             <Routes>

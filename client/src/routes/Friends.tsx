@@ -30,7 +30,7 @@ const ContentBox = styled.div`
   overflow-x: hidden;
   margin-left: -17px;
   padding-left: 17px;
-  height: 514px;
+  height: 504px;
 
   &::-webkit-scrollbar {
     width: 14px; /* 세로 스크롤바 폭 */
@@ -472,9 +472,9 @@ function Friends() {
       <TitleBox>
         <h1>친구</h1>
         <TopMenu>
-          <li>
+          {/* <li>
             <i className="xi-search"></i>
-          </li>
+          </li> */}
           <li onClick={() => handleOpenModal('addFriend')}>
             <i className="xi-user-plus-o"></i>
           </li>

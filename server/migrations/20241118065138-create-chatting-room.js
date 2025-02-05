@@ -2,25 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Profile', {
-      id: {
+    await queryInterface.createTable('chatting_room', {
+      room_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_id: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
-      profile_img_url: {
-        type: Sequelize.STRING(255),
-      },
-      bg_img_url: {
-        type: Sequelize.STRING(255),
-      },
-      state_msg: {
+      room_name: {
         type: Sequelize.STRING(100),
+      },
+      type: {
+        type: Sequelize.STRING(20),
+      },
+      last_message: {
+        type: Sequelize.STRING(100),
+      },
+      last_message_created_at: {
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,
@@ -33,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Profile');
+    await queryInterface.dropTable('chatting_room');
   },
 };

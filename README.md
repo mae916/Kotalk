@@ -1,7 +1,13 @@
 # 카카오톡 구현하기
 
 - react와 ts 학습과 백엔드를 직접 구축 해보고 싶은 마음과 socket.io에 대한 흥미로 이 프로젝트를 시작하게 되었습니다.
-- 실제 카카오톡을 실행해보며 실제 구현 불가한 부분(페이, 쇼핑몰 등)은 커스터마이징하고 모두 스스로 제작하였습니다.
+- 로그인, 회원가입, 친구추가, 채팅, 메시지 삭제, 프로필 사진 및 배경 바꾸기 등이 가능합니다.
+- 시작부터 배포까지 모두 혼자 진행한 프로젝트이고, 현재 기능 추가 + 디버깅 중에 있습니다. 
+
+## 배포 주소
+- 아래 주소에서 회원가입 or 아래 테스트 아이디로 사용해 볼 수 있습니다.
+- 테스트 아이디1: test@naver.com 비밀번호:1234 / 테스트 아이디2: test2@naver.com 비밀번호:1234
+- https://katalk.jinproject.xyz/login
 
 ## 시작 가이드
 
@@ -16,6 +22,7 @@
 
   ```
   $cd client
+  $npm i
   $npm run start
   ```
 
@@ -23,6 +30,7 @@
 
   ```
   $cd server
+  $npm i
   $npm run dev
   ```
 
@@ -31,15 +39,15 @@
   <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black">
   <img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"> 
   <img src="https://img.shields.io/badge/recoil-3578E5?style=for-the-badge&logo=recoil&logoColor=white">
+  <img src="https://img.shields.io/badge/aws-ff9900?style=for-the-badge&logo=aws&logoColor=black">
+  <img src="https://img.shields.io/badge/docker-1d63ed?style=for-the-badge&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/nginx-009900?style=for-the-badge&logo=nginx&logoColor=white">
   <img src="https://img.shields.io/badge/styledcomponents-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white">
   <img src="https://img.shields.io/badge/reactquery-FF4154?style=for-the-badge&logo=reactquery&logoColor=white">
   <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
   <img src="https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white">
   <img src="https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white">
   <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
-  <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
-  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
-  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
   <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black">
 </div>
 
@@ -47,7 +55,7 @@
 - https://www.erdcloud.com/d/rFyZbfuc4uZFQDGys
   
 ## API (Swagger)
-- (server path)/api-docs/
+- https://katalk.jinproject.xyz/api/docs/
 
 ## 프로젝트 구조
 

@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IUser } from '../types';
 import { joinAxios } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   padding: 10px;
@@ -62,9 +63,12 @@ function Join() {
     formState: { isValid, errors },
     watch,
   } = useForm<IUser>();
+  const navigate = useNavigate();
 
-  function joinHandler(data: any) {
-    joinAxios(data);
+  async function joinHandler(data: any) {
+    await joinAxios(data);
+    alert('회원가입이 완료 되었습니다🎉');
+    navigate('/login');
   }
   return (
     <Container>

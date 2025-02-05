@@ -143,10 +143,10 @@ function Login() {
 
   return (
     <LoginContainer>
-      <Header>
+      {/* <Header>
         <i className="xi-minus-thin"></i>
         <i className="xi-close-thin"></i>
-      </Header>
+      </Header> */}
       <LogoBox>
         <i className="xi-kakaotalk"></i>
       </LogoBox>
@@ -171,21 +171,21 @@ function Login() {
 
           <SubmitBtn disabled={!isValid}>로그인</SubmitBtn>
         </form>
-        <Line>또는</Line>
+        {/* <Line>또는</Line>
         <SnsLogin>
           <li></li>
-        </SnsLogin>
-        <AutoLogin>
+        </SnsLogin> */}
+        {/* <AutoLogin>
           <input type="radio" />
           <span>자동로그인</span>
-        </AutoLogin>
+        </AutoLogin> */}
       </FormBox>
       <JoinBox>
         <div>
           <Link to="/join">회원가입하기</Link>
         </div>
-        <VerticalLine>|</VerticalLine>
-        <div>계정 / 비밀번호 찾기</div>
+        {/* <VerticalLine>|</VerticalLine>
+        <div>계정 / 비밀번호 찾기</div> */}
       </JoinBox>
     </LoginContainer>
   );

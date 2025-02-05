@@ -1,7 +1,7 @@
+import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import express from 'express';
-import { join } from 'path';
 import { Server } from 'socket.io';
 import authRouter from './routes/auth';
 import friendsRouter from './routes/friends';
@@ -11,25 +11,43 @@ import initSocket from './sockets/socket';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { swaggerUi, specs } from './swagger/swagger';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import path from 'path';
 import chattingRouter from './routes/chatting';
 
-dotenv.config();
+// // dotenv 설정
+// dotenv.config({
+//   path: process.env.NODE_ENV === 'production' ? './.env.prod' : './.env.dev',
+// });
 
+let server;
+let port;
 const app = express();
-const port = 4000;
 
-// SSL 인증서 파일 경로
-const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, '../../cert.key')),
-  cert: fs.readFileSync(path.join(__dirname, '../../cert.crt')),
-};
+if (process.env.NODE_ENV === 'production') {
+  server = http.createServer(app); // HTTP 서버
+  port = 8000;
+} else {
+  // 개발 환경에서 HTTPS 서버
+  // const sslOptions = {
+  //   key: fs.readFileSync(path.resolve(__dirname, '../../cert.key')),
+  //   cert: fs.readFileSync(path.resolve(__dirname, '../../cert.crt')),
+  // };
+  // server = https.createServer(sslOptions, app); // HTTPS 서버 생성
+  server = http.createServer(app); // HTTP 서버
+  port = 4000;
+  // CORS 설정
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    })
+  );
+}
 
-const server = https.createServer(sslOptions, app); // HTTPS 서버 생성
 const io = new Server(server, {
+  path: '/api/socket.io',
   cors: {
-    // 두번째 인자는 서버 구성 옵션 객체, CORS활성화
     origin: true,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -37,72 +55,36 @@ const io = new Server(server, {
   },
 });
 
+const apiRouter = express.Router();
+
 // 쿠키 파싱 미들웨어 사용
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: 'https://localhost:3000',
-    credentials: true,
-  })
-);
+// API 문서화
+apiRouter.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
+// JSON 파싱 미들웨어
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-// Static 파일 경로 설정
-app.use('/assets', express.static(path.join(__dirname, '../assets')));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-/**
- * @swagger
- * tags:
- *  name: Auth
- *  description: 유저 계정 관련 api
- */
-app.use('/auth', authRouter);
+// 정적 파일 경로 설정
+apiRouter.use('/assets', express.static(path.join(__dirname, '../assets')));
+apiRouter.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-/**
- * @swagger
- * tags:
- *  name: Friend
- *  description: 친구 정보 관련 api
- */
-app.use('/friends', friendsRouter);
+// 라우터 설정
+apiRouter.use('/auth', authRouter);
+apiRouter.use('/friends', friendsRouter);
+apiRouter.use('/upload', uploadRouter);
+apiRouter.use('/profile', profileRouter);
+apiRouter.use('/chatting', chattingRouter);
 
-/**
- * @swagger
- * tags:
- *  name: Upload
- *  description: 업로드 관련 api
- */
-app.use('/upload', uploadRouter);
+// API 경로 등록
+app.use('/api', apiRouter);
 
-/**
- * @swagger
- * tags:
- *  name: Profile
- *  description: 유저 프로필 관련 api
- */
-app.use('/profile', profileRouter);
-
-/**
- * @swagger
- * tags:
- *  name: Chatting
- *  description: 채팅 관련 api
- */
-app.use('/chatting', chattingRouter);
-
-app.get('*', function (req, res) {
-  res.sendFile(join(__dirname, '../../client/public/index.html'));
-});
-
-// 소켓 관련 이벤트 초기화
+// 소켓 초기화
 initSocket(io);
 
 // 서버 시작
 server.listen(port, () => {
-  console.log(`Server running at https://localhost:${port}`);
+  console.log(`Server running at http:${process.env.DEV_SERVER_HOST}/`);
 });

@@ -1,5 +1,5 @@
-import db from '../models';
-import database from '../config/mysql';
+import db from '../../models';
+import database from '../../config/mysql';
 
 // 상태 메시지 변경
 export async function setStateMsg(req, res) {

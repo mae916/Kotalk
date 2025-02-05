@@ -1,9 +1,9 @@
-import db from '../models';
-import database from '../config/mysql';
+import db from '../../models';
+import database from '../../config/mysql';
 import jwt from 'jsonwebtoken';
 import { generateTokens } from '../utils/authUtils';
 import { mySqlNowDateTime } from '../utils/dateUtil';
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
 const saltRounds = 10;
 
@@ -30,6 +30,8 @@ export async function login(req, res) {
     if (!isPasswordValid) {
       return res.status(401).json({ message: '비밀번호가 틀렸습니다.' });
     }
+
+    console.log('유저정보',user);
 
     const { access_token, refresh_token } = generateTokens(user);
     const date = mySqlNowDateTime(); // 날짜 포맷

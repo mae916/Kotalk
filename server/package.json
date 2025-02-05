@@ -8,7 +8,9 @@
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "env-cmd": "^10.1.0",
     "express": "^4.21.1",
     "express-sanitizer": "^1.0.6",
     "fs": "0.0.1-security",
@@ -22,9 +24,9 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node src/server.js",
+    "dev": "env-cmd -f .env.dev nodemon --exec babel-node src/server.js",
     "build": "babel src -d build",
-    "start": "babel-node src/server.js"
+    "start": "env-cmd -f .env.prod babel-node src/server.js"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

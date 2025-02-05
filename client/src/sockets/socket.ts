@@ -4,7 +4,10 @@ let socket: any = null;
 
 export const initSocket = () => {
   if (!socket) {
-    socket = io(`${process.env.REACT_APP_API_URL}`);
+    socket = io(process.env.REACT_APP_SERVER_URL, {
+          path:'/api/socket.io',
+          transports: ["websocket"],
+        });
     socket.on('connect', () => {
       console.log('socket connect');
     });

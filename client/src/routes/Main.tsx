@@ -4,7 +4,7 @@ import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-
 import Friends from './Friends';
 import ChatList from './ChatList';
 import Banner from '../components/Banner';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getSocket } from '../sockets/socket';
 import { getReadNotCountAxios } from '../api/chatting';
 import { useRecoilValue } from 'recoil';
@@ -33,34 +33,35 @@ const RouteBox = styled.div`
 `;
 
 function Main() {
-  const [socket, setSocket] = useState<any>();
   const [readNotCount, setReadNotCount] = useState<number>(0); // 메시지 읽지 않은 수
   const user = useRecoilValue<IUserAtom>(userDataState);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const socket = getSocket();
+
   if(location.pathname === '/') {
     navigate('/login');
   }
 
-  if (socket) {
-    socket.on('receive_msg', () => {
-      console.log('Main receive_msg');
-      setTimeout(getReadNotCount, 100);
-    });
-
-    socket.on('read_count_apply', () => {
-      setTimeout(getReadNotCount, 100);
-    });
-  }
-
   useEffect(() => {
-    if (!socket) {
-      const socketInstance = getSocket(); // 처음에만 생성
-      setSocket(socketInstance);
+    getReadNotCount();
+
+    const getCount = () => {
+      setTimeout(getReadNotCount, 100);
     }
 
-    getReadNotCount();
+    socket.removeListener('receive_msg');
+    socket.removeListener('read_count_apply');
+
+    socket.on('receive_msg', getCount);
+    socket.on('read_count_apply', getCount);
+
+    return () => {
+      socket.off('receive_msg', getCount);
+      socket.off('read_count_apply', getCount);
+    };
+
   }, []);
 
   async function getReadNotCount() {
@@ -79,8 +80,8 @@ function Main() {
           </CloseBox>
           <RouteBox>
             <Routes>
-              <Route path="friends" element={<Friends />} />
-              <Route path="chatList" element={<ChatList />} />
+              <Route path="friends" element={<Friends socket={socket} />} />
+              <Route path="chatList" element={<ChatList socket={socket} />} />
             </Routes>
           </RouteBox>
         </ContentBox>

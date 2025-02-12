@@ -341,7 +341,7 @@ const Line = styled.hr`
   margin: 0;
 `;
 
-function Friends() {
+function Friends({ socket } : any) {
   const [openModal, setOpenModal] = useState<string | null>(null);
   const [user, setUser] = useRecoilState<IUserAtom>(userDataState);
   const [postImg, setPostImg] = useState<any>(null); // 서버에 보낼 img
@@ -643,7 +643,7 @@ function Friends() {
         </Modal>
       )}
       {openModal === 'chatting' && (
-        <ChattingRoom handleCloseModal={handleCloseModal}></ChattingRoom>
+        <ChattingRoom handleCloseModal={handleCloseModal} socket={socket} ></ChattingRoom>
       )}
     </Container>
   );

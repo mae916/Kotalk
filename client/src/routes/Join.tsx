@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IUser } from '../types';
-import { joinAxios } from '../api/auth';
+import { joinAxios, emailCheckAxios } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
@@ -35,6 +35,7 @@ const ContentBox = styled.div`
         height: 35px;
         padding: 10px;
         margin-top: 4px;
+        font-size: 0.8rem;
       }
     }
   }
@@ -70,6 +71,11 @@ function Join() {
     alert('회원가입이 완료 되었습니다🎉');
     navigate('/login');
   }
+
+  async function checkEmailHandler(value: string) {
+    const message = emailCheckAxios(value);
+    return message;
+  }
   return (
     <Container>
       <LogoBox>
@@ -87,6 +93,7 @@ function Join() {
                     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
                   message: '이메일 형식이 아닙니다.',
                 },
+                validate: { checkEmailHandler },
               })}
               type="text"
             />

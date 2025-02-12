@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Modal from './Modal';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { getSocket } from '../sockets/socket';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userDataState, participantState } from '../recoil/auth/atom';
@@ -296,15 +296,17 @@ const SubmitBtn = styled.button`
 type ChattingRoomProps = {
   friendId?: number | null;
   handleCloseModal: () => void;
+  socket?: any;
 };
 
-function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
+function ChattingRoom ({ handleCloseModal, socket } : ChattingRoomProps) {
+  console.log('ChattingRoom 렌더링');
   const user = useRecoilValue<any>(userDataState);
-  const [participant, setParticipant] = useRecoilState(participantState);
+  const participant = useRecoilValue(participantState);
   const [msgList, setMsgList] = useState<any>([]);
-  const [socket, setSocket] = useState<any>(getSocket());
-  const [roomName, setRoomName] = useState<string>(
-    `${participant.room_name}_${participant.room_id}`
+  const roomName = useMemo(
+    () => `${participant.room_name}_${participant.room_id}`,
+    [participant.room_name, participant.room_id]
   );
   const [visible, setVisible] = useState<boolean>(false);
   const [selectedMsg, setSelectedMsg] = useState<any>({});
@@ -329,28 +331,17 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
   const previousMsgDate = useRef<string | null>(null); // ref로 이전 메시지 날짜를 저장
 
   useEffect(() => {
-    const roomName = `${participant.room_name}_${participant.room_id}`;
-    setRoomName(roomName);
-  }, [participant]);
-
-  useEffect(() => {
-    if (!socket) {
-      const socketInstance = getSocket(); // 처음에만 생성
-      setSocket(socketInstance);
-    }
-
     getChattingList();
-
     handleFocus();
   }, []);
 
-  useEffect(() => {
-    // inView 가 true 일때 리스트를 업데이트
-    if (inView) {
-      console.log('inview');
-      getChattingList();
-    }
-  }, [inView]);
+  // useEffect(() => {
+  //   // inView 가 true 일때 리스트를 업데이트
+  //   if (inView) {
+  //     console.log('inview');
+  //     getChattingList();
+  //   }
+  // }, [inView]);
 
   //스크롤 하단 고정
   useEffect(() => {
@@ -360,23 +351,25 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
   useEffect(() => {
     if (socket) {
       socket.removeListener('receive_msg');
+      socket.removeListener('read_count_apply');
+      
       //메시지 받기
-      socket.on('receive_msg', (user: any, message: string) => {
+      socket.on('receive_msg', (msgData: any) => {
         console.log('receive_msg');
-        addMessage(user, message);
+        addMessage(msgData);
       });
 
       // 읽은 사람 정보 받아오기
       socket.on('read_count_apply', (userId: number) => {
         console.log('read_count_apply');
-        updateReadUser(userId);
+        updateReadUser(userId); // 양쪽 참여자 모두 이 함수를 실행 시킴 그래서 두번일어남
       });
 
       // 삭제된 메시지 정보 받아오기
-      socket.on('del_message_apply', (chatId: number) => {
-        console.log('del_message_apply');
-        // getChattingList();
-      });
+      // socket.on('del_message_apply', (chatId: number) => {
+      //   console.log('del_message_apply');
+      //   // getChattingList();
+      // });
 
       window.addEventListener('focus', handleFocus);
       window.addEventListener('blur', handleBlur);
@@ -416,6 +409,7 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
   }
 
   async function getChattingList() {
+    console.log('getChattingList');
     if (hasMore) {
       const data = await getMsgListAxios(
         participant.room_id,
@@ -433,7 +427,7 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
     }
   }
 
-  function addMessage(author: any, message: string) {
+  function formattingMsg(author: any, message: string) {
     console.log('visiblevisible', visible);
     const obj = {
       message,
@@ -455,16 +449,25 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
     console.log('visible', visible);
     console.log('obj', obj);
     console.log('author.user_id', author.user_id);
-    setChatMessageAxios(obj);
+    return obj;
+    // setChatMessageAxios(obj);
 
+    // setMsgList((prev: any[] = []) => {
+    //   const data = [...prev, { ...obj }];
+    //   return data;
+    // });
+  }
+
+  function addMessage(msgData:any) {
     setMsgList((prev: any[] = []) => {
-      const data = [...prev, { ...obj }];
+      const data = [...prev, { ...msgData }];
       return data;
     });
   }
   const chatSubmitHandler = (data: { message: string }) => {
     if (roomName && socket) {
-      socket.emit('send_msg', user, roomName, data.message); // 메시지 전송
+      const obj = formattingMsg(user, data.message);
+      socket.emit('send_msg', roomName, obj); // 메시지 전송
       reset(); // 입력창 초기화
     } else {
       console.error('소켓 연결 실패');
@@ -573,14 +576,14 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
           {msgList?.map((msg: any, i: number) => {
             const dateToShow = formattedDate(msg);
             return (
-              <>
+              <div key={i}>
                 {dateToShow && (
                   <DateList>
                     <div>{dateToShow}</div>
                   </DateList>
                 )}
                 <ChattingList
-                  key={i}
+                  
                   onContextMenu={(event) => handleContextMenu(event, msg)}
                 >
                   {user.user_id === msg.user_id ? (
@@ -629,7 +632,7 @@ function ChattingRoom({ handleCloseModal }: ChattingRoomProps) {
                     </>
                   )}
                 </ChattingList>
-              </>
+              </div>
             );
           })}
           {isContextMenuOpen && (

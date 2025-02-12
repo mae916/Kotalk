@@ -136,9 +136,11 @@ function Login() {
 
   async function loginHandler(data: any) {
     const datas = await loginAxios(data);
-    setUserData(datas.data);
-    socket.emit('login_user', datas.data.user_id);
-    navigate('/friends');
+    if (datas?.data) {
+      setUserData(datas.data);
+      socket.emit('login_user', datas.data.user_id);
+      navigate('/friends');
+    }
   }
 
   return (

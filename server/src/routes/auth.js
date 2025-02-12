@@ -5,6 +5,7 @@ import {
   getAccessToken,
   getUser,
   verifyAccessToken,
+  emailDuplicateCheck,
 } from '../controllers/authController';
 
 const authRouter = Router();
@@ -174,5 +175,7 @@ authRouter.post('/login', login);
 authRouter.post('/getAccessToken', getAccessToken);
 
 authRouter.get('/getUser', verifyAccessToken, getUser);
+
+authRouter.post('/emailCheck', emailDuplicateCheck);
 
 export default authRouter;

@@ -22,16 +22,18 @@ export async function login(req, res) {
     });
 
     if (!user) {
-      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      return res
+        .status(401)
+        .json({ message: '아이디 또는 비밀번호가 잘못되었습니다.' });
     }
 
     // 비밀번호 확인
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: '비밀번호가 틀렸습니다.' });
+      return res
+        .status(401)
+        .json({ message: '아이디 또는 비밀번호가 잘못되었습니다.' });
     }
-
-    console.log('유저정보',user);
 
     const { access_token, refresh_token } = generateTokens(user);
     const date = mySqlNowDateTime(); // 날짜 포맷
@@ -60,7 +62,9 @@ export async function login(req, res) {
     return res.status(200).json({ message: '로그인 성공', data: newObj });
   } catch (err) {
     console.error('서버 에러:', err);
-    return res.status(500).json({ message: '서버 오류' });
+    return res.status(500).json({
+      message: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+    });
   }
 }
 
@@ -101,6 +105,32 @@ export async function join(req, res) {
     });
   } catch (err) {
     console.error('회원가입 중 오류 발생:', err);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
+//이메일 계정 중복체크(계정 유무)
+export async function emailDuplicateCheck(req, res) {
+  const { email } = req.body;
+  console.log(email);
+
+  try {
+    // 사용자 찾기
+    const user = await db.Account.findOne({
+      raw: true,
+      where: { user_email: email },
+    });
+
+    if (user) {
+      return res.status(401).json({ message: '이미 존재하는 계정 입니다.' });
+    }
+
+    // 성공 응답
+    return res.status(201).json({
+      message: '사용 가능한 계정 입니다.',
+    });
+  } catch (err) {
+    console.error('오류 발생:', err);
     return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 }

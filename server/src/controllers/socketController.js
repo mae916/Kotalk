@@ -122,3 +122,51 @@ export async function updateReadUser(room_id, user_id) {
     console.log('읽은 유저 이미 업데이트 되었음.');
   }
 }
+
+//채팅 메시지 저장
+export async function setChattingMessage(msgData) {
+//   const { userId, roomId, message } = msgData;
+
+  console.log('server로 들어온 msgData', msgData);
+
+  try {
+    // 이미 메시지가 DB에 저장된 상태인지 확인
+    const existingMessage = await db.Chatting.findOne({
+      where: {
+        user_id: msgData.user_id,
+        message: msgData.message,
+        createdAt: new Date(),
+      },
+    });
+
+    if (existingMessage) {
+      console.log('이미 저장된 메시지입니다.');
+      return; // 중복 메시지 방지
+    }
+
+    // 메시지 추가
+    const newChat = await db.Chatting.create({
+      user_id: msgData.user_id,
+      room_id: msgData.room_id,
+      message: msgData.message,
+      del_yn: msgData.del_yn,
+    });
+
+    // 읽지 않은 사람
+    msgData.participant.forEach(async (participantId) => {
+      msgData.read_not_user.forEach(async (readNotUser) => {
+        db.Msg_read_user.create({
+          chat_id: newChat.chat_id,
+          user_id: participantId,
+          room_id: msgData.room_id,
+          read_yn: participantId == readNotUser ? 'n' : 'y',
+        });
+      });
+    });
+
+    console.log('채팅 메시지 저장 성공');
+  } catch (error) {
+    console.error(error);
+    console.log('서버 오류');
+  }
+}

@@ -71,6 +71,8 @@ export async function getReadNotCount(req, res) {
 export async function getChattingList(req, res) {
   const { userId } = req.body;
 
+  console.log('server getChattingList',userId);
+
   try {
     // const [result] = await database.query(
     //   'SELECT chatting.message, chatting.createdAt, chat_participant.room_id, chatting_room.room_name, chat_participant.friend_id FROM chat_participant LEFT JOIN chatting_room ON chat_participant.room_id = chatting_room.room_id LEFT JOIN chatting ON chat_participant.room_id = chatting.room_id WHERE chat_participant.user_id = ?',
@@ -275,6 +277,7 @@ export async function createPersonalRoom(req, res) {
 //메세지 리스트 조회
 export async function getMsgList(req, res) {
   const { roomId, lastId, pageSize } = req.query;
+  console.log('getMsgList',roomId,lastId,pageSize);
   try {
     let query = '';
     let result = [];
@@ -360,6 +363,8 @@ export async function getMsgList(req, res) {
 export async function setChatMessage(req, res) {
   //  if (req.method.toUpperCase() === 'OPTIONS') return;
   const { msg } = req.body;
+
+  console.log('server로 들어온 msg', msg);
   try {
     // 이미 메시지가 DB에 저장된 상태인지 확인
     const existingMessage = await db.Chatting.findOne({

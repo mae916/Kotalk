@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getChattingListAxios } from '../api/chatting';
 import { userDataState, participantState } from '../recoil/auth/atom';
@@ -6,7 +6,6 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { IUserAtom, ChatRoom } from '../types';
 import ChattingRoom from '../components/ChattingRoom';
 import { handleClick } from '../utils';
-import { getSocket } from '../sockets/socket';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -205,38 +204,43 @@ const ReadNotCount = styled.div<{ $isCount: boolean }>`
   `}
 `;
 
-function ChatList() {
+function ChatList({ socket }: { socket: any }) {
+  console.log('ChatList 렌더링');
   const user = useRecoilValue<IUserAtom>(userDataState);
   const setParticipant = useSetRecoilState<ChatRoom>(participantState);
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
-  const [selectedId, setSelectedId] = useState<number>(0);
   const [openModal, setOpenModal] = useState<string | null>(null);
-  const [socket, setSocket] = useState<any>();
 
+  let selectedId = 0;
+  
   useEffect(() => {
-    if (!socket) {
-      const socketInstance = getSocket(); // 처음에만 생성
-      setSocket(socketInstance);
-    }
     getChattingList();
-    if (socket) {
-      socket.on('receive_msg', () => {
-        console.log('chartList receive_msg');
-        setTimeout(getChattingList, 200);
-      });
 
-      socket.on('read_count_apply', () => {
-        console.log('chartList read_count_apply');
+    if (socket) {
+      const getList = () => {
         setTimeout(getChattingList, 200);
-      });
+      };
+
+      socket.removeListener('receive_msg');
+      socket.removeListener('read_count_apply');
+
+      socket.on('receive_msg', getList);
+      socket.on('read_count_apply', getList);
+
+      return () => {
+        socket.off('receive_msg', getList);
+        socket.off('read_count_apply', getList);
+      };
     }
-  }, [socket, openModal]);
+  }, []);
 
   async function getChattingList() {
     try {
       console.log('chartList getChattingList', user.user_id);
       const { data } = await getChattingListAxios(user.user_id);
-      if (data) {
+      
+      if (data && JSON.stringify(data) !== JSON.stringify(rooms)) {
+        // 기존 rooms와 값이 다를때만 setRooms 호출(불필요한 재렌더링 줄이기)
         setRooms(data);
         console.log('data', data);
       }
@@ -249,22 +253,21 @@ function ChatList() {
     setOpenModal(modalType); // 특정 모달 열기
   }
 
-  function handleCloseModal() {
-    setOpenModal(null); // 모든 모달 닫기
-  }
+  const handleCloseModal = useCallback(() => {
+    setOpenModal(null);
+  }, []);
 
   function roomListClick(id: number) {
-    setSelectedId(id);
+    selectedId = id;
   }
 
   function roomListDbClick(id: number) {
+    const selectedRoom = rooms.find((room) => room.room_id === id);
+    if (selectedRoom) {
+      setParticipant(selectedRoom);
+    }
+    selectedId = id;
     handleOpenModal('room');
-    setSelectedId(id);
-    rooms.forEach((room) => {
-      if (room.room_id === id) {
-        setParticipant(room);
-      }
-    });
   }
 
   return (
@@ -324,7 +327,7 @@ function ChatList() {
         ))}
       </ContentBox>
       {openModal === 'room' && (
-        <ChattingRoom handleCloseModal={handleCloseModal}></ChattingRoom>
+        <ChattingRoom handleCloseModal={handleCloseModal} socket={socket}></ChattingRoom>
       )}
     </Container>
   );

@@ -66,6 +66,27 @@ export async function createPersonalRoomAxios(
   }
 }
 
+// 나와의 채팅방 생성 혹은 조회
+export async function createAloneRoomAxios(userId: number) {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/chatting/createAloneRoom`,
+      { userId },
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식으로 보내기
+        },
+      }
+    );
+
+    // 서버에서 받은 유저 정보 반환
+    return response.data;
+  } catch (error) {
+    console.error('나와의 채팅방 생성 혹은 조회 실패:', error);
+    throw new Error('나와의 채팅방 생성 혹은 조회를 실패했습니다.');
+  }
+}
+
 // 채팅 내용 조회
 export async function getMsgListAxios(
   roomId: number,

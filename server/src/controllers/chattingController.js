@@ -71,7 +71,7 @@ export async function getReadNotCount(req, res) {
 export async function getChattingList(req, res) {
   const { userId } = req.body;
 
-  console.log('server getChattingList',userId);
+  console.log('server getChattingList', userId);
 
   try {
     // const [result] = await database.query(
@@ -133,7 +133,10 @@ export async function getChattingList(req, res) {
 
       const friendData = result2[0] || {};
       groupedData[item.room_id].images.push(friendData.profile_img_url || null);
-      groupedData[item.room_id].ids.push(friendData.user_id || null);
+      if (friendData.user_id) {
+        // 친구 아이디가 있는 경우만 (나와의 채팅인 경우 제외)
+        groupedData[item.room_id].ids.push(friendData.user_id || null);
+      }
     }
 
     // `Object.values`로 데이터 배열로 변환
@@ -205,7 +208,10 @@ export async function getChatRoomInfo(req, res) {
       console.log('result2result2', result2);
       const friendData = result2[0] || {};
       groupedData[item.room_id].images.push(friendData.profile_img_url || null);
-      groupedData[item.room_id].ids.push(friendData.friend_id || null);
+      if (friendData.user_id) {
+        // 친구 아이디가 있는 경우만 (나와의 채팅인 경우 제외)
+        groupedData[item.room_id].ids.push(friendData.user_id || null);
+      }
     }
 
     // `Object.values`로 데이터 배열로 변환
@@ -274,10 +280,57 @@ export async function createPersonalRoom(req, res) {
   }
 }
 
+// 나와의 채팅방 생성여부 확인 후 room_id를 반환
+export async function createAloneRoom(req, res) {
+  const { userId } = req.body;
+
+  try {
+    // 유저아이디로 존재하는 채팅방 있는지 확인
+    const [room] = await database.query(
+      'SELECT * FROM chat_participant as participant LEFT JOIN chatting_room as room ON participant.room_id = room.room_id WHERE participant.user_id = ? and room.type = ?',
+      [userId, 'alone']
+    );
+
+    let newRoom;
+
+    //채팅방이 없는 경우 채팅방과 참가자를 만듦
+    if (room.length == 0) {
+      const user = await db.Account.findOne({
+        where: {
+          user_id: userId,
+        },
+      });
+
+      newRoom = await db.Chatting_room.create({
+        type: 'alone',
+        room_name: user.user_name,
+      });
+
+      //내 방 만들기
+      await db.Chat_participant.create({
+        room_id: newRoom.room_id,
+        user_id: userId,
+        friend_id: userId,
+      });
+    }
+
+    const data = {
+      room_id: room.length == 0 ? newRoom.room_id : room[0].room_id,
+    };
+
+    return res
+      .status(200)
+      .json({ message: '나와의 채팅방 생성 혹은 채팅방 조회 성공', data });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: '서버 오류' });
+  }
+}
+
 //메세지 리스트 조회
 export async function getMsgList(req, res) {
   const { roomId, lastId, pageSize } = req.query;
-  console.log('getMsgList',roomId,lastId,pageSize);
+  console.log('getMsgList', roomId, lastId, pageSize);
   try {
     let query = '';
     let result = [];

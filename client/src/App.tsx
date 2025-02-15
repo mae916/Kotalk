@@ -33,13 +33,15 @@ const GlobalStyle = createGlobalStyle`
   *[hidden] {
       display: none;
   }
+  html {
+    font-size: 20px; /** 17px === 1rem */
+  }
+  html, body {
+    height: 100%;  /* html과 body의 높이를 100%로 설정 */
+  }
   body {
     line-height: 1;
-    font-family: "Source Sans 3", sans-serif;
-    width: 375px;
-    height: 667px;
     border: 1px solid #dfdfdf;
-    margin: 30px auto 0;
     position:relative;
   }
   menu, ol, ul {
@@ -59,8 +61,6 @@ const GlobalStyle = createGlobalStyle`
   }
   * {
     box-sizing: border-box;
-    font-size: 10px; /** 10px === 1rem */
-    font-family: Arial, Helvetica, sans-serif;
   }
   a {
     text-decoration: none;
@@ -76,6 +76,17 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+  button {
+    border:0;
+    background-color: transparent;
+  }
+/* 1200px 이상일 때 (일반 모니터 사이즈 기준) */
+@media (min-width: 1200px) {
+  html {
+    font-size: 23px;
+  }
+}
+
 `;
 
 function App() {

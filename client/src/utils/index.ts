@@ -34,7 +34,7 @@ export const resizeImage: ResizeImage = async (
 };
 
 export function handleClick(
-  event: React.MouseEvent<HTMLLIElement>,
+  event: React.MouseEvent<HTMLElement>,
   clickFn: any,
   dbCLickFn: any
 ) {

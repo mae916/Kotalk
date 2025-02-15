@@ -13,12 +13,13 @@ const TitleBox = styled.div`
   font-size: 0.9rem;
   display: flex;
   justify-content: space-between;
-  margin: 0 18px 10px 0;
+  align-items: center;
+  margin: 0 18px 15px 0;
 `;
 const TopMenu = styled.ul`
   display: flex;
   & i {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: #9d9d9d;
   }
   & > li:first-child i {
@@ -30,7 +31,7 @@ const ContentBox = styled.ul`
   overflow-x: hidden;
   margin-left: -17px;
   padding-left: 17px;
-  height: 508px;
+  /* height: 508px; */
 
   &::-webkit-scrollbar {
     width: 14px; /* 세로 스크롤바 폭 */

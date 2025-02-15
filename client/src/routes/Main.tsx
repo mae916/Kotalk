@@ -16,11 +16,17 @@ import { getReadNotCountAxios } from '../api/chatting';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth/atom';
 import { IUserAtom } from '../types';
-const MainContainer = styled.div``;
+
+const MainContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
 
 const Inner = styled.div`
+  flex-grow: 1;
   display: grid;
-  grid-template-columns: 58px 1fr;
+  grid-template-columns: minmax(58px, 5%) 1fr;
 `;
 const ContentBox = styled.div``;
 const CloseBox = styled.div`

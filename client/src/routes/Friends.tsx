@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Modal from '../components/Modal';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { participantState, userState } from '../recoil/auth/atom';
-import { profileAxios } from '../api/upload';
-import { stateMsgAxios } from '../api/profile';
 import { getUserAxios } from '../api/auth';
 import { IUserAtom, ChatRoom } from '../types';
+import { getFriendsListAxios } from '../api/friends';
+import { handleClick } from '../utils';
 import {
-  addFriendAxios,
-  getFriendsListAxios,
-  searchUserAxios,
-} from '../api/friends';
-import { useForm } from 'react-hook-form';
-import { handleClick, resizeImage } from '../utils';
+  createPersonalRoomAxios,
+  getChatRoomInfoAxios,
+  createAloneRoomAxios,
+} from '../api/chatting';
 import ChattingRoom from '../components/ChattingRoom';
-import { createPersonalRoomAxios, getChatRoomInfoAxios } from '../api/chatting';
+import Profile from '../components/Profile';
+import ProfileSetting from '../components/ProfileSetting';
+import AddFriend from '../components/AddFriend';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -23,6 +22,7 @@ const TitleBox = styled.div`
   font-size: 0.9rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 0 18px 10px 0;
 `;
 const ContentBox = styled.div`
@@ -30,7 +30,7 @@ const ContentBox = styled.div`
   overflow-x: hidden;
   margin-left: -17px;
   padding-left: 17px;
-  height: 504px;
+  /* height: 504px; */
 
   &::-webkit-scrollbar {
     width: 14px; /* 세로 스크롤바 폭 */
@@ -52,7 +52,7 @@ const ContentBox = styled.div`
 const TopMenu = styled.ul`
   display: flex;
   & i {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: #9d9d9d;
   }
   & > li:first-child i {
@@ -62,18 +62,26 @@ const TopMenu = styled.ul`
 const AddFriends = styled.li`
   cursor: pointer;
 `;
-const MyInfo = styled.div`
+const MyInfo = styled.div<{ $isSelected: boolean }>`
   display: flex;
   align-items: center;
-  margin: 10px 0 20px;
-  padding-top: 15px;
-
+  margin-left: -17px;
+  padding: 7px 7px 7px 17px;
+  flex-grow: 1;
+  background-color: #ededed;
+  margin: 10px 0 10px -17px;
+  background-color: ${(props) =>
+    props.$isSelected ? '#ededed' : 'transparent'};
+  &:hover {
+    background-color: #f5f5f5;
+  }
   & > img {
     width: 50px;
     height: 50px;
     border-radius: 20px;
     margin-right: 10px;
     object-fit: cover;
+    cursor: pointer;
   }
 `;
 
@@ -88,15 +96,15 @@ const FriendsBox = styled.div`
 
 const FriendCount = styled.div`
   color: #7a7a7a;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   display: flex;
-  align-items: end;
-  margin-bottom: 5px;
+  align-items: center;
+  margin-bottom: 10px;
   & > h2 {
-    margin-right: 5px;
+    margin-right: 7px;
   }
   span {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 `;
 const FriendListBox = styled.ul``;
@@ -110,7 +118,6 @@ const FriendList = styled.li<{ $isSelected: boolean }>`
   &:hover {
     background-color: #f5f5f5;
   }
-
   & img {
     width: 50px;
     height: 50px;
@@ -119,253 +126,29 @@ const FriendList = styled.li<{ $isSelected: boolean }>`
     margin-right: 10px;
   }
 `;
-const TopBtnsBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-const BgBtn = styled.i`
-  color: #ffffff;
-  margin: 12px 0 0 14px;
-  border: 1px solid #ffffff;
-  border-radius: 5px;
-  padding: 2px;
-  font-size: 0.8rem;
-`;
-const CloseBtn = styled.i`
-  display: flex;
-  justify-content: right;
-  margin: 10px 10px 0 0;
-  font-size: 0.8rem;
-  color: #c6c6c6;
-`;
-const AddBox = styled.div`
-  padding: 20px;
-  & > h2 {
-    font-size: 0.9rem;
-    color: #2b2b2b;
-  }
-  & input {
-    border: 0;
-    border-bottom: 1px solid #eaeaea;
-    font-size: 0.8rem;
-    margin-top: 30px;
-    padding: 10px 2px;
-    width: 100%;
-  }
-`;
-const FriendProfile = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 35px;
-  & > img {
-    width: 60px;
-    height: 60px;
-    border-radius: 23px;
-    object-fit: cover;
-    margin-bottom: 12px;
-  }
-  & > h3 {
-    font-size: 0.65rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  & > span {
-    font-size: 0.65rem;
-    margin-bottom: 70px;
-    color: #a6a6a6;
-  }
-`;
-const AddSubmitBtn = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: end;
-  & > button {
-    color: #000000;
-    background-color: #fee500;
-    height: 34px;
-    border-radius: 2px;
-    margin-top: 5px;
-    border: 0;
-    font-size: 0.7rem;
-    width: 80px;
-    &:disabled {
-      color: #adadad;
-      background-color: #f6f6f6;
-    }
-  }
-`;
 
-const ErrorMsg = styled.span`
-  font-size: 0.65rem;
-  color: #8d8d8d;
-  margin-top: 5px;
-`;
-
-const ProfileBox = styled.div<{ bg: string }>`
-  background-image: url(${(props) => props.bg});
-  background-size: cover;
-  background-position: center;
-  & ${CloseBtn} {
-    color: #ffffffba;
-  }
-  & ${MyInfo} {
-    flex-direction: column;
-    border: 0;
-    color: #ffffff;
-    & img {
-      margin: 0;
-      margin-bottom: 12px;
-      width: 70px;
-      height: 70px;
-    }
-    & ${UserName} {
-      font-size: 0.9rem;
-    }
-  }
-`;
 const StateMsg = styled.div`
   font-size: 0.65rem;
   margin-top: 7px;
 `;
 
-const BottomBtnsBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  border-top: 1px solid #ffffff28;
-  padding: 30px 0;
-  & div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #ffffff;
-    & i {
-      margin-bottom: 15px;
-    }
-    & span {
-      font-size: 0.7rem;
-    }
-  }
-`;
-
-const PositionBottom = styled.div`
-  margin-top: 200px;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-`;
-const SettingBox = styled.div`
-  padding: 20px;
-  & > h2 {
-    font-size: 0.85rem;
-  }
-`;
-const ImgBox = styled.div`
-  position: relative;
-  margin: 35px 0 25px;
-  text-align: center;
-  & input {
-    display: none;
-  }
-  & img {
-    border-radius: 30px;
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border: 1px solid #dedede;
-  }
-  & i {
-    position: absolute;
-    bottom: 5px;
-    left: 147px;
-    border: 1px solid #cacaca;
-    border-radius: 50%;
-    padding: 2px 3px 3px;
-    text-align: center;
-    background-color: #fff;
-    color: #4c4c4c;
-    font-size: 0.9rem;
-  }
-`;
-const SettingForm = styled.form``;
-
-const SettingInput = styled.div`
-  position: relative;
-  & > input {
-    border: 0;
-    border-bottom: 1px solid #000000;
-    color: #000;
-    font-size: 0.8rem;
-    padding: 7px 1px;
-    width: 100%;
-  }
-  & span {
-    position: absolute;
-    right: 0px;
-    bottom: 7px;
-    font-size: 0.77rem;
-    color: #949391;
-  }
-`;
-const SettingButtons = styled.div`
-  display: flex;
-  justify-content: right;
-  align-items: center;
-  margin-top: 150px;
-  & * {
-    font-size: 0.68rem;
-  }
-  & button {
-    border: 0;
-    background-color: #fada0a;
-    width: 70px;
-    height: 35px;
-    border-radius: 2px;
-  }
-  & div {
-    border: 1px solid #d3d3d3;
-    width: 70px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 7px;
-    border-radius: 2px;
-  }
-`;
-
 const Line = styled.hr`
   width: 98%;
   border: 0px;
-  border-top: 1px solid #f6f6f6;
+  border-top: 1px solid #ededed;
   margin: 0;
 `;
 
 function Friends({ socket }: any) {
   const [openModal, setOpenModal] = useState<string | null>(null);
   const [user, setUser] = useRecoilState<IUserAtom>(userState);
-  const [postImg, setPostImg] = useState<any>(null); // 서버에 보낼 img
-  const [previewImg, setPreviewImg] = useState<any>(user.profile_img_url || ''); //미리보기 img
-  const [stateMsg, setStateMsg] = useState<string>(user.state_msg || '');
-  const [keyword, setKeyword] = useState<string>('');
-  const [searchUser, setSearchUser] = useState<any>(null);
   const [friends, setFriends] = useState<any>([]);
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
   const setParticipant = useSetRecoilState<ChatRoom>(participantState);
 
-  const {
-    register,
-    formState: { isValid, errors },
-  } = useForm<any>();
-
   useEffect(() => {
-    (async () => {
-      await getUserInfo();
-      await getFriendList();
-    })();
+    getUserInfo();
+    getFriendList();
   }, []);
 
   async function getUserInfo() {
@@ -394,67 +177,6 @@ function Friends({ socket }: any) {
     setOpenModal(null); // 모든 모달 닫기
   }
 
-  function getStateMsg(event: React.ChangeEvent<HTMLInputElement>) {
-    const {
-      currentTarget: { value },
-    } = event;
-    setStateMsg(value);
-  }
-
-  function profileUploadHandler(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target?.files?.[0];
-    setPostImg(file);
-    if (file && ['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
-      const fileReader = new FileReader();
-      fileReader.onload = () => setPreviewImg(fileReader.result);
-      fileReader.readAsDataURL(file);
-    } else {
-      alert('이미지 파일만 업로드 가능합니다.');
-    }
-  }
-
-  async function profileSubmitHandler(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (postImg) {
-      const img = await resizeImage(postImg, 300, 300);
-      const formData = new FormData();
-      formData.append('image', img); // 서버의 키와 일치해야 함
-      formData.append('user_id', String(user.user_id));
-      await profileAxios(formData);
-    }
-    if (stateMsg) {
-      const userData = { user_id: user.user_id, state_msg: stateMsg };
-      await stateMsgAxios(userData);
-    }
-    // 모든 API 호출이 성공적으로 완료된 후, 유저 정보를 갱신
-    await getUserInfo();
-
-    handleCloseModal();
-  }
-
-  function getKeywordHandler(event: React.ChangeEvent<HTMLInputElement>) {
-    const {
-      currentTarget: { value },
-    } = event;
-    setKeyword(value);
-  }
-
-  async function getSearchFriends(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const data = await searchUserAxios(keyword);
-    setSearchUser(data.user);
-  }
-
-  async function addFriendHandler() {
-    const friendId = searchUser.user_id;
-    const userId = user.user_id;
-    const friendName = searchUser.user_name;
-    await addFriendAxios({ friendId, userId, friendName });
-    await getFriendList();
-    handleCloseModal();
-  }
-
   function friendListClick(id: number) {
     setSelectedFriendId(id);
   }
@@ -462,6 +184,19 @@ function Friends({ socket }: any) {
     const {
       data: { room_id },
     } = await createPersonalRoomAxios(user.user_id, friendId);
+    const { data: roomInfo } = await getChatRoomInfoAxios(
+      user.user_id,
+      room_id
+    );
+    setParticipant(roomInfo);
+    handleOpenModal('chatting');
+  }
+
+  async function chatToMe() {
+    const {
+      data: { room_id },
+    } = await createAloneRoomAxios(user.user_id);
+
     const { data: roomInfo } = await getChatRoomInfoAxios(
       user.user_id,
       room_id
@@ -485,7 +220,16 @@ function Friends({ socket }: any) {
       </TitleBox>
       <ContentBox>
         <Line />
-        <MyInfo>
+        <MyInfo
+          $isSelected={selectedFriendId === user.user_id}
+          onClick={(e) =>
+            handleClick(
+              e,
+              () => friendListClick(user.user_id),
+              () => chatToMe()
+            )
+          }
+        >
           <img
             onClick={() => handleOpenModal('profile')}
             src={user.profile_img_url}
@@ -529,122 +273,33 @@ function Friends({ socket }: any) {
           </FriendListBox>
         </FriendsBox>
       </ContentBox>
+
+      {/* 친구추가 */}
       {openModal === 'addFriend' && (
-        <Modal>
-          <CloseBtn
-            className="xi-close"
-            onClick={() => handleCloseModal()}
-          ></CloseBtn>
-          <AddBox>
-            <h2>친구 추가</h2>
-            <form onSubmit={getSearchFriends}>
-              <SettingInput>
-                <input
-                  {...register('user_email', {
-                    required: '친구 이메일 계정을 입력하세요.',
-                    pattern: {
-                      value:
-                        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                      message: '이메일 형식이 아닙니다.',
-                    },
-                  })}
-                  onChange={getKeywordHandler}
-                  type="text"
-                  placeholder="친구 이메일 계정"
-                  maxLength={30}
-                />
-                <span>{keyword.length}/30</span>
-              </SettingInput>
-              <ErrorMsg>
-                {errors.user_email && String(errors.user_email?.message)}
-              </ErrorMsg>
-            </form>
-            {searchUser && (
-              <FriendProfile>
-                <img src={searchUser.profile_img_url} alt="" />
-                <h3>{searchUser.user_name}</h3>
-                <span>{searchUser.state_msg}</span>
-                <AddSubmitBtn>
-                  <button
-                    onClick={addFriendHandler}
-                    disabled={!isValid || !searchUser}
-                  >
-                    친구 추가
-                  </button>
-                </AddSubmitBtn>
-              </FriendProfile>
-            )}
-          </AddBox>
-        </Modal>
+        <AddFriend
+          handleCloseModal={handleCloseModal}
+          getFriendList={getFriendList}
+        ></AddFriend>
       )}
+
+      {/* 프로필 상세 */}
       {openModal === 'profile' && (
-        <Modal>
-          <ProfileBox bg={user.bg_img_url}>
-            <TopBtnsBox>
-              <BgBtn className="xi-image-o"></BgBtn>
-              <CloseBtn
-                className="xi-close"
-                onClick={() => handleCloseModal()}
-              ></CloseBtn>
-            </TopBtnsBox>
-            <PositionBottom>
-              <MyInfo>
-                <img src={user.profile_img_url} alt="" />
-                <UserName>{user.user_name}</UserName>
-                <StateMsg>{user.state_msg}</StateMsg>
-              </MyInfo>
-              <BottomBtnsBox>
-                <div>
-                  <i className="xi-speech"></i>
-                  <span>나와의 채팅</span>
-                </div>
-                <div onClick={() => handleOpenModal('profileSetting')}>
-                  <i className="xi-pen"></i>
-                  <span>프로필 편집</span>
-                </div>
-              </BottomBtnsBox>
-            </PositionBottom>
-          </ProfileBox>
-        </Modal>
+        <Profile
+          handleCloseModal={handleCloseModal}
+          handleOpenModal={handleOpenModal}
+          chatToMe={chatToMe}
+        ></Profile>
       )}
+
+      {/* 프로필 설정 */}
       {openModal === 'profileSetting' && (
-        <Modal>
-          <CloseBtn
-            className="xi-close"
-            onClick={() => handleCloseModal()}
-          ></CloseBtn>
-          <SettingBox>
-            <h2>기본프로필 편집</h2>
-            <ImgBox>
-              <label>
-                <img src={previewImg} alt="" />
-                <i className="xi-camera"></i>
-                <input
-                  onChange={profileUploadHandler}
-                  type="file"
-                  accept=".png, .jpeg, .jpg"
-                />
-              </label>
-            </ImgBox>
-            <SettingForm onSubmit={profileSubmitHandler}>
-              <SettingInput>
-                <input
-                  type="text"
-                  value={stateMsg}
-                  placeholder="상태메시지"
-                  onChange={getStateMsg}
-                  maxLength={20}
-                />
-                <span>{stateMsg.length}/20</span>
-              </SettingInput>
-              <SettingButtons>
-                <button>확인</button>
-                <div onClick={() => handleCloseModal()}>취소</div>
-              </SettingButtons>
-            </SettingForm>
-          </SettingBox>
-        </Modal>
+        <ProfileSetting
+          handleCloseModal={handleCloseModal}
+          getUserInfo={getUserInfo}
+        ></ProfileSetting>
       )}
+
+      {/* 채팅창 */}
       {openModal === 'chatting' && (
         <ChattingRoom
           handleCloseModal={handleCloseModal}

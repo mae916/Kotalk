@@ -12,6 +12,8 @@ import { useInView } from 'react-intersection-observer';
 const Container = styled.div`
   background-color: #bacee0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 const CloseBtn = styled.i`
   display: flex;
@@ -19,6 +21,7 @@ const CloseBtn = styled.i`
   padding: 10px 10px 0 0;
   font-size: 0.8rem;
   color: #9e9e9e;
+  cursor: pointer;
 `;
 const ChattingInfo = styled.div`
   padding: 0 15px 8px;
@@ -28,7 +31,7 @@ const ChattingBox = styled.ul`
   overflow-x: hidden;
   margin-left: -17px;
   padding: 0px 12px 12px 32px;
-  height: 300px;
+  flex-grow: 1;
   margin-right: 3px;
   &::-webkit-scrollbar {
     width: 10px; /* 세로 스크롤바 폭 */
@@ -258,13 +261,14 @@ const ChattingBtnBox = styled.div``;
 const ChatFormBox = styled.form`
   width: 100%;
   background-color: #fff;
-  height: 110px;
+  min-height: 25%;
   padding: 10px 0;
   text-align: right;
   & > textarea {
     width: 100%;
     border: 0;
-    height: 70%;
+    min-height: calc(100% - 29%);
+    height: calc(100% - 50px);
     resize: none;
     padding: 0 5px 0 10px;
     font-size: 0.8rem;
@@ -278,9 +282,9 @@ const SubmitBtn = styled.button`
   border: 0;
   background-color: #fee500;
   color: #423630;
-  padding: 5px 10px 6px;
-  font-size: 0.5rem;
-  margin: 3px 7px;
+  padding: 5px 15px 6px;
+  font-size: 0.9rem;
+  margin: 3px 10px;
   border-radius: 2px;
   &:disabled {
     color: #adadad;

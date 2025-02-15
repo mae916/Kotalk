@@ -125,7 +125,7 @@ export async function updateReadUser(room_id, user_id) {
 
 //채팅 메시지 저장
 export async function setChattingMessage(msgData) {
-//   const { userId, roomId, message } = msgData;
+  //   const { userId, roomId, message } = msgData;
 
   console.log('server로 들어온 msgData', msgData);
 
@@ -165,6 +165,31 @@ export async function setChattingMessage(msgData) {
     });
 
     console.log('채팅 메시지 저장 성공');
+  } catch (error) {
+    console.error(error);
+    console.log('서버 오류');
+  }
+}
+
+// 메시지 삭제
+export async function deleteMessage(msgData) {
+  console.log('msgData', msgData);
+  try {
+    const targetChat = await db.Chatting.findOne({
+      where: {
+        createdAt: msgData.createdAt,
+        room_id: msgData.room_id,
+        user_id: msgData.user_id,
+      },
+    });
+    console.log('targetChat', targetChat);
+
+    await db.Chatting.update(
+      { del_yn: 'y' },
+      { where: { chat_id: targetChat.chat_id } }
+    );
+
+    console.log('메시지 삭제 성공!');
   } catch (error) {
     console.error(error);
     console.log('서버 오류');

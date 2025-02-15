@@ -212,7 +212,7 @@ function ChatList({ socket }: { socket: any }) {
   const [openModal, setOpenModal] = useState<string | null>(null);
 
   let selectedId = 0;
-  
+
   useEffect(() => {
     getChattingList();
 
@@ -238,7 +238,7 @@ function ChatList({ socket }: { socket: any }) {
     try {
       console.log('chartList getChattingList', user.user_id);
       const { data } = await getChattingListAxios(user.user_id);
-      
+
       if (data && JSON.stringify(data) !== JSON.stringify(rooms)) {
         // 기존 rooms와 값이 다를때만 setRooms 호출(불필요한 재렌더링 줄이기)
         setRooms(data);
@@ -327,7 +327,10 @@ function ChatList({ socket }: { socket: any }) {
         ))}
       </ContentBox>
       {openModal === 'room' && (
-        <ChattingRoom handleCloseModal={handleCloseModal} socket={socket}></ChattingRoom>
+        <ChattingRoom
+          handleCloseModal={handleCloseModal}
+          socket={socket}
+        ></ChattingRoom>
       )}
     </Container>
   );

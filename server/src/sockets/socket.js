@@ -1,7 +1,8 @@
 import {
   getRoomNameList,
   updateReadUser,
-  setChattingMessage
+  setChattingMessage,
+  deleteMessage,
 } from '../controllers/socketController';
 
 // 특정 유저가 특정 방에 있는지 확인하는 함수
@@ -45,6 +46,10 @@ function initSocket(io) {
       setChattingMessage(msgData);
 
       const targetSocket = userSocketMap.get(msgData.user_id);
+      if (!targetSocket) {
+        console.error(`User socket not found for user_id: ${msgData.user_id}`);
+        return;
+      }
 
       // 해당 room에 참여 여부 확인
       if (!isUserInRoom(io, targetSocket.id, roomName)) {
@@ -68,8 +73,9 @@ function initSocket(io) {
     });
 
     // 메시지 삭제 처리
-    socket.on('del_message', (roomName, chat_id) => {
-      io.to(roomName).emit('del_message_apply', chat_id);
+    socket.on('del_message', (roomName, msgData) => {
+      deleteMessage(msgData);
+      io.to(roomName).emit('del_message_apply', msgData);
     });
 
     // 방 나가기

@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import Modal from './Modal';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { userDataState, participantState } from '../recoil/auth/atom';
-import { getMsgListAxios, setDeleteMessageAxios } from '../api/chatting';
+import { userState, participantState } from '../recoil/auth/atom';
+import { getMsgListAxios } from '../api/chatting';
 import { amPmformat } from '../utils';
 import { useForm } from 'react-hook-form';
 import ContextMenu from '../components/ContextMenu';
@@ -296,7 +296,7 @@ type ChattingRoomProps = {
 
 function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
   console.log('ChattingRoom 렌더링');
-  const user = useRecoilValue<any>(userDataState);
+  const user = useRecoilValue<any>(userState);
   const participant = useRecoilValue(participantState);
   const [msgList, setMsgList] = useState<any>([]);
   const roomName = useMemo(

@@ -4,7 +4,7 @@ import { IUser } from '../types';
 import { loginAxios } from '../api/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { userDataState } from '../recoil/auth/atom';
+import { userState } from '../recoil/auth/atom';
 import { getSocket } from '../sockets/socket';
 import { useEffect, useState } from 'react';
 
@@ -120,7 +120,7 @@ const VerticalLine = styled.div`
 `;
 
 function Login() {
-  const setUserData = useSetRecoilState(userDataState);
+  const setUserData = useSetRecoilState(userState);
   const [socket, setSocket] = useState<any>(null);
   const navigate = useNavigate();
   const {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Modal from '../components/Modal';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { participantState, userDataState } from '../recoil/auth/atom';
+import { participantState, userState } from '../recoil/auth/atom';
 import { profileAxios } from '../api/upload';
 import { stateMsgAxios } from '../api/profile';
 import { getUserAxios } from '../api/auth';
@@ -58,6 +58,9 @@ const TopMenu = styled.ul`
   & > li:first-child i {
     margin-right: 10px;
   }
+`;
+const AddFriends = styled.li`
+  cursor: pointer;
 `;
 const MyInfo = styled.div`
   display: flex;
@@ -341,9 +344,9 @@ const Line = styled.hr`
   margin: 0;
 `;
 
-function Friends({ socket } : any) {
+function Friends({ socket }: any) {
   const [openModal, setOpenModal] = useState<string | null>(null);
-  const [user, setUser] = useRecoilState<IUserAtom>(userDataState);
+  const [user, setUser] = useRecoilState<IUserAtom>(userState);
   const [postImg, setPostImg] = useState<any>(null); // 서버에 보낼 img
   const [previewImg, setPreviewImg] = useState<any>(user.profile_img_url || ''); //미리보기 img
   const [stateMsg, setStateMsg] = useState<string>(user.state_msg || '');
@@ -475,9 +478,9 @@ function Friends({ socket } : any) {
           {/* <li>
             <i className="xi-search"></i>
           </li> */}
-          <li onClick={() => handleOpenModal('addFriend')}>
+          <AddFriends onClick={() => handleOpenModal('addFriend')}>
             <i className="xi-user-plus-o"></i>
-          </li>
+          </AddFriends>
         </TopMenu>
       </TitleBox>
       <ContentBox>
@@ -643,7 +646,10 @@ function Friends({ socket } : any) {
         </Modal>
       )}
       {openModal === 'chatting' && (
-        <ChattingRoom handleCloseModal={handleCloseModal} socket={socket} ></ChattingRoom>
+        <ChattingRoom
+          handleCloseModal={handleCloseModal}
+          socket={socket}
+        ></ChattingRoom>
       )}
     </Container>
   );

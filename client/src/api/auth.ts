@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IUser } from '../types';
+import { IUser, IUserAtom } from '../types';
 import { AxiosError } from 'axios';
 //로그인
 export async function loginAxios(userData: IUser) {
@@ -48,6 +48,29 @@ export async function loginAxios(userData: IUser) {
         alert('로그인 요청에 실패했습니다.');
       }
     }
+  }
+}
+
+//로그아웃
+export async function logoutAxios(userData: IUserAtom) {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/auth/logout`,
+      { email: userData.user_email },
+      {
+        headers: {
+          'Content-Type': 'application/json', // JSON 형식으로 보내기
+          Authorization: `Bearer ${userData.access_token}`, // 토큰 포함
+        },
+        withCredentials: true, // 쿠키 포함
+      }
+    );
+
+    // 서버에서 받은 응답을 반환
+    return response.data;
+  } catch (error) {
+    console.error('로그아웃 실패:', error);
+    throw new Error('로그아웃 요청에 실패했습니다.');
   }
 }
 

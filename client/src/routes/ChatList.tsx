@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getChattingListAxios } from '../api/chatting';
-import { userDataState, participantState } from '../recoil/auth/atom';
+import { userState, participantState } from '../recoil/auth/atom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { IUserAtom, ChatRoom } from '../types';
 import ChattingRoom from '../components/ChattingRoom';
@@ -206,7 +206,7 @@ const ReadNotCount = styled.div<{ $isCount: boolean }>`
 
 function ChatList({ socket }: { socket: any }) {
   console.log('ChatList 렌더링');
-  const user = useRecoilValue<IUserAtom>(userDataState);
+  const user = useRecoilValue<IUserAtom>(userState);
   const setParticipant = useSetRecoilState<ChatRoom>(participantState);
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [openModal, setOpenModal] = useState<string | null>(null);

@@ -6,6 +6,7 @@ import {
   getUser,
   verifyAccessToken,
   emailDuplicateCheck,
+  logout,
 } from '../controllers/authController';
 
 const authRouter = Router();
@@ -129,6 +130,7 @@ authRouter.post('/join', join);
  *         description: "서버 오류가 발생했습니다."
  */
 authRouter.post('/login', login);
+authRouter.post('/logout', verifyAccessToken, logout);
 
 /**
  * @swagger

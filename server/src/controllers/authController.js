@@ -68,6 +68,25 @@ export async function login(req, res) {
   }
 }
 
+export async function logout(req, res) {
+  const { email } = req.body;
+
+  //db에 저장된 refreshToken 삭제
+  await db.Account.update(
+    { refresh_token: null },
+    { where: { user_email: email } }
+  );
+
+  // 쿠키에서 refreshToken 삭제
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
+
+  res.status(200).json({ message: '로그아웃 성공' });
+}
+
 //회원가입
 export async function join(req, res) {
   const { user_email, password, user_name } = req.body;

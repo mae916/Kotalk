@@ -1,9 +1,8 @@
 import { atom } from 'recoil';
-import socketio, { Socket } from 'socket.io-client';
 import { IUserAtom, ChatRoom } from '../../types';
 
-export const userDataState = atom<IUserAtom>({
-  key: 'userDataState',
+export const userState = atom<IUserAtom>({
+  key: 'userState',
   default: {
     user_id: 0,
     user_email: '',

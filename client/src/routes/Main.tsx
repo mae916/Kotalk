@@ -1,6 +1,12 @@
 import styled from 'styled-components';
 import SideMenu from '../components/SideMenu';
-import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+  useNavigate,
+} from 'react-router-dom';
 import Friends from './Friends';
 import ChatList from './ChatList';
 import Banner from '../components/Banner';
@@ -8,7 +14,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getSocket } from '../sockets/socket';
 import { getReadNotCountAxios } from '../api/chatting';
 import { useRecoilValue } from 'recoil';
-import { userDataState } from '../recoil/auth/atom';
+import { userState } from '../recoil/auth/atom';
 import { IUserAtom } from '../types';
 const MainContainer = styled.div``;
 
@@ -34,13 +40,13 @@ const RouteBox = styled.div`
 
 function Main() {
   const [readNotCount, setReadNotCount] = useState<number>(0); // 메시지 읽지 않은 수
-  const user = useRecoilValue<IUserAtom>(userDataState);
+  const user = useRecoilValue<IUserAtom>(userState);
   const navigate = useNavigate();
   const location = useLocation();
 
   const socket = getSocket();
 
-  if(location.pathname === '/') {
+  if (location.pathname === '/') {
     navigate('/login');
   }
 
@@ -49,7 +55,7 @@ function Main() {
 
     const getCount = () => {
       setTimeout(getReadNotCount, 100);
-    }
+    };
 
     socket.removeListener('receive_msg');
     socket.removeListener('read_count_apply');
@@ -61,7 +67,6 @@ function Main() {
       socket.off('receive_msg', getCount);
       socket.off('read_count_apply', getCount);
     };
-
   }, []);
 
   async function getReadNotCount() {

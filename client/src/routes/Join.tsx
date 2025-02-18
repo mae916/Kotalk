@@ -11,6 +11,7 @@ const Container = styled.div`
 `;
 
 const LogoBox = styled.div`
+  cursor: pointer;
   text-align: center;
   margin: 10px;
   & > i {
@@ -69,16 +70,20 @@ function Join() {
   async function joinHandler(data: any) {
     await joinAxios(data);
     alert('회원가입이 완료 되었습니다🎉');
-    navigate('/login');
+    goLogin();
   }
 
   async function checkEmailHandler(value: string) {
     const message = emailCheckAxios(value);
     return message;
   }
+
+  function goLogin() {
+    navigate('/login');
+  }
   return (
     <Container>
-      <LogoBox>
+      <LogoBox onClick={goLogin}>
         <i className="xi-kakaotalk"></i>
       </LogoBox>
       <ContentBox>

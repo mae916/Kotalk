@@ -28,12 +28,12 @@ import { Op } from 'sequelize';
 export async function getRoomNameList(userId) {
   // 친구 아이디와 유저아이디로 존재하는 채팅방 있는지 확인
   const [rooms] = await database.query(
-    'SELECT chat_participant.room_id, chatting_room.room_name, chat_participant.friend_id, chatting_room.last_message, chatting_room.last_message_created_at FROM chat_participant LEFT JOIN chatting_room ON chat_participant.room_id = chatting_room.room_id WHERE chat_participant.user_id = ?',
+    'SELECT chat_participant.room_id, chatting_room.room_uuid FROM chat_participant LEFT JOIN chatting_room ON chat_participant.room_id = chatting_room.room_id WHERE chat_participant.user_id = ?',
     [userId]
   );
 
   const names = rooms.map((room) => {
-    return `${room.room_name}_${room.room_id}`;
+    return `${room.room_uuid}_${room.room_id}`;
   });
 
   return names;
@@ -73,37 +73,6 @@ export async function getRoomInfo(roomId) {
 
   return data;
 }
-
-//채팅 메시지 저장
-// export async function setChatMessage(msgData) {
-//   const { userId, roomId, message } = msgData;
-
-//  const newChat =  await db.Chatting.create({
-//     user_id: userId,
-//     room_id: roomId,
-//     message: message,
-//     del_yn: 'n',
-//   });
-
-//   // 메시지 추가
-//   await db.Msg_read_user.create({
-//     chat_id:newChat.chat_id,
-//     user_id: userId,
-//     room_id: roomId,
-//   });
-// }
-
-//메시지 리스트 가져오기
-// export async function getMessageList(roomId) {
-//   const [room] = await database.query(
-//     'SELECT * FROM chatting LEFT JOIN msg_read_user AS `read` ON chatting.room_id = `read`.room_id WHERE chatting.room_id = ?',
-//     [roomId]
-//   );
-//   return room;
-// }
-
-// 채팅방 입장
-export async function enterRoom() {}
 
 //메시지 읽은 유저 업데이트
 export async function updateReadUser(room_id, user_id) {
@@ -153,6 +122,7 @@ export async function setChattingMessage(msgData) {
     });
 
     // 읽지 않은 사람
+    console.log('setChattingMessage msgData', msgData);
     msgData.participant.forEach(async (participantId) => {
       msgData.read_not_user.forEach(async (readNotUser) => {
         db.Msg_read_user.create({

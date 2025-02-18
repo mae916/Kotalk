@@ -9,16 +9,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      room_name: {
-        type: Sequelize.STRING(100),
-      },
       type: {
         type: Sequelize.STRING(20),
       },
-      last_message: {
-        type: Sequelize.STRING(100),
+      room_uuid: {
+        type: Sequelize.STRING(50),
       },
-      last_message_created_at: {
+      deletedAt: {
         type: Sequelize.DATE,
       },
       createdAt: {

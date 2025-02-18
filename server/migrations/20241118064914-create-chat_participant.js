@@ -17,9 +17,8 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      friend_id: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
+      leftAt: {
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,

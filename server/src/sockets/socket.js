@@ -44,7 +44,8 @@ function initSocket(io) {
 
       //받아온 msgData db에 저장
       setChattingMessage(msgData);
-
+      console.log('msgData', msgData);
+      console.log('msgData.user_id', msgData.user_id);
       const targetSocket = userSocketMap.get(msgData.user_id);
       if (!targetSocket) {
         console.error(`User socket not found for user_id: ${msgData.user_id}`);
@@ -59,7 +60,8 @@ function initSocket(io) {
         targetSocket.join(roomName); // 방에 참가
       }
 
-      io.to(roomName).emit('receive_msg', msgData); // 메시지 전송
+      io.to(roomName).emit('receive_msg', msgData); // 메시지 전송 - 그외
+      io.to(roomName).emit('receive_msg_room', msgData); // 메시지 전송 - 채팅방에서 사용
       // console.log(`Message sent to room ${roomName}: ${message}`);
 
       const room = io.sockets.adapter.rooms.get(roomName);
@@ -86,6 +88,21 @@ function initSocket(io) {
     // 연결 해제
     socket.on('disconnect', () => {
       console.log('A user disconnected:', socket.id);
+
+      // 유저 정보 삭제 (로그인 시 저장한 userId 삭제)
+      const userId = socket.data.userId;
+      if (userId) {
+        userSocketMap.delete(userId); // 사용자 소켓 정보 삭제
+        console.log(
+          `User ${userId} disconnected and removed from userSocketMap.`
+        );
+      }
+
+      // 연결된 방에서 나가기
+      socket.rooms.forEach((roomName) => {
+        socket.leave(roomName);
+        console.log(`User ${socket.id} left room ${roomName}`);
+      });
     });
   });
 }

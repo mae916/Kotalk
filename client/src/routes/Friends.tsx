@@ -6,11 +6,7 @@ import { getUserAxios } from '../api/auth';
 import { IUserAtom, ChatRoom } from '../types';
 import { getFriendsListAxios } from '../api/friends';
 import { handleClick } from '../utils';
-import {
-  createPersonalRoomAxios,
-  getChatRoomInfoAxios,
-  createAloneRoomAxios,
-} from '../api/chatting';
+import { enterRoomAxios, getChatRoomInfoAxios } from '../api/chatting';
 import ChattingRoom from '../components/ChattingRoom';
 import Profile from '../components/Profile';
 import ProfileSetting from '../components/ProfileSetting';
@@ -164,6 +160,8 @@ function Friends({ socket }: any) {
     try {
       const { data } = await getFriendsListAxios(user.user_id);
       setFriends(data);
+
+      console.log('getFriendList', data);
     } catch (error) {
       console.error('친구 목록 조회 실패:', error);
     }
@@ -181,13 +179,15 @@ function Friends({ socket }: any) {
     setSelectedFriendId(id);
   }
   async function friendListDbClick(friendId: number) {
+    const users = [user.user_id, friendId];
     const {
       data: { room_id },
-    } = await createPersonalRoomAxios(user.user_id, friendId);
+    } = await enterRoomAxios(users);
     const { data: roomInfo } = await getChatRoomInfoAxios(
       user.user_id,
       room_id
     );
+    console.log('Friends roomInfo', roomInfo);
     setParticipant(roomInfo);
     handleOpenModal('chatting');
   }
@@ -195,7 +195,7 @@ function Friends({ socket }: any) {
   async function chatToMe() {
     const {
       data: { room_id },
-    } = await createAloneRoomAxios(user.user_id);
+    } = await enterRoomAxios([user.user_id]);
 
     const { data: roomInfo } = await getChatRoomInfoAxios(
       user.user_id,

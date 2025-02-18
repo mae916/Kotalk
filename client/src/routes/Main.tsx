@@ -52,26 +52,17 @@ function Main() {
 
   const socket = getSocket();
 
-  if (location.pathname === '/') {
-    navigate('/login');
-  }
-
   useEffect(() => {
+    if (location.pathname === '/') {
+      navigate('/login');
+    }
+
     getReadNotCount();
-
-    const getCount = () => {
-      setTimeout(getReadNotCount, 100);
-    };
-
-    socket.removeListener('receive_msg');
-    socket.removeListener('read_count_apply');
-
-    socket.on('receive_msg', getCount);
-    socket.on('read_count_apply', getCount);
-
+    socket.on('receive_msg', () => setTimeout(getReadNotCount, 500));
+    socket.on('read_count_apply', () => setTimeout(getReadNotCount, 500));
     return () => {
-      socket.off('receive_msg', getCount);
-      socket.off('read_count_apply', getCount);
+      socket.off('receive_msg', getReadNotCount);
+      socket.off('read_count_apply', getReadNotCount);
     };
   }, []);
 

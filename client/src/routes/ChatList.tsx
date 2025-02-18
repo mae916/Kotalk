@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getChattingListAxios } from '../api/chatting';
+import {
+  getChattingListAxios,
+  leaveRoomAxios,
+  getReadNotMsgListAxios,
+} from '../api/chatting';
 import { userState, participantState } from '../recoil/auth/atom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { IUserAtom, ChatRoom } from '../types';
 import ChattingRoom from '../components/ChattingRoom';
 import { handleClick } from '../utils';
+import ContextMenu from '../components/ContextMenu';
+import { useLocation } from 'react-router-dom';
 
 const Container = styled.div``;
 const TitleBox = styled.div`
@@ -155,7 +161,9 @@ const TextBox = styled.div`
   justify-content: space-between;
 `;
 const LeftBox = styled.div``;
-const Title = styled.div``;
+const Title = styled.div`
+  display: flex;
+`;
 const Names = styled.span`
   font-size: 0.7rem;
   font-weight: 600;
@@ -205,12 +213,31 @@ const ReadNotCount = styled.div<{ $isCount: boolean }>`
   `}
 `;
 
+const Me = styled.div`
+  background-color: #4a525c;
+  color: #fff;
+  border-radius: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  font-size: 0.55rem;
+  font-weight: bold;
+  text-align: center;
+  line-height: 0.7rem;
+  margin-right: 4px;
+`;
+
 function ChatList({ socket }: { socket: any }) {
   console.log('ChatList 렌더링');
   const user = useRecoilValue<IUserAtom>(userState);
   const setParticipant = useSetRecoilState<ChatRoom>(participantState);
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [openModal, setOpenModal] = useState<string | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    top: 0,
+    left: 0,
+  });
+  const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<ChatRoom>();
 
   let selectedId = 0;
 
@@ -218,45 +245,51 @@ function ChatList({ socket }: { socket: any }) {
     getChattingList();
 
     if (socket) {
-      const getList = () => {
-        setTimeout(getChattingList, 200);
-      };
-
-      socket.removeListener('receive_msg');
-      socket.removeListener('read_count_apply');
-
-      socket.on('receive_msg', getList);
-      socket.on('read_count_apply', getList);
+      socket.on('receive_msg', () => setTimeout(getChattingList, 500));
+      socket.on('read_count_apply', () => setTimeout(getReadNotMsgList, 500));
 
       return () => {
-        socket.off('receive_msg', getList);
-        socket.off('read_count_apply', getList);
+        socket.off('receive_msg', getChattingList);
+        socket.off('read_count_apply', getReadNotMsgList);
       };
     }
   }, []);
 
   async function getChattingList() {
-    try {
-      console.log('chartList getChattingList', user.user_id);
-      const { data } = await getChattingListAxios(user.user_id);
+    console.log('chartList getChattingList', user.user_id);
+    const { data } = await getChattingListAxios(user.user_id);
 
-      if (data && JSON.stringify(data) !== JSON.stringify(rooms)) {
-        // 기존 rooms와 값이 다를때만 setRooms 호출(불필요한 재렌더링 줄이기)
-        setRooms(data);
-        console.log('data', data);
-      }
-    } catch (error) {
-      console.error('채팅 리스트 조회 실패:', error);
+    if (data && JSON.stringify(data) !== JSON.stringify(rooms)) {
+      //기존 rooms와 값이 다를때만 setRooms 호출(불필요한 재렌더링 줄이기)
+      setRooms(data);
+      console.log('data', data);
     }
   }
 
+  async function getReadNotMsgList() {
+    console.log('chartList getReadNotMsgList', user.user_id);
+    const { data } = await getReadNotMsgListAxios(user.user_id);
+    console.log('rooms', rooms);
+
+    setRooms((prevRooms) => {
+      const newRooms = prevRooms.map((room) => {
+        const matched = data.find((item: any) => item.room_id === room.room_id);
+        return {
+          ...room,
+          read_n_count: matched ? matched.read_n_count : 0,
+        };
+      });
+
+      return newRooms;
+    });
+  }
   function handleOpenModal(modalType: string) {
     setOpenModal(modalType); // 특정 모달 열기
   }
 
-  const handleCloseModal = useCallback(() => {
+  function handleCloseModal() {
     setOpenModal(null);
-  }, []);
+  }
 
   function roomListClick(id: number) {
     selectedId = id;
@@ -270,6 +303,34 @@ function ChatList({ socket }: { socket: any }) {
     selectedId = id;
     handleOpenModal('room');
   }
+
+  function handleContextMenu(event: React.MouseEvent<HTMLElement>, room: any) {
+    event.preventDefault();
+
+    setSelectedRoom(room);
+
+    const { clientX, clientY } = event; // 화면에서 클릭된 좌표
+
+    // 부모 요소를 기준으로 메뉴 위치 보정
+    setContextMenuPosition({
+      top: clientY,
+      left: clientX,
+    });
+
+    setIsContextMenuOpen(true);
+  }
+
+  async function leaveRoom() {
+    await leaveRoomAxios(selectedRoom?.room_id, user.user_id);
+    getChattingList();
+  }
+
+  const contextMenuOptions = [
+    {
+      label: '채팅방 나가기',
+      onClick: leaveRoom,
+    },
+  ];
 
   return (
     <Container>
@@ -285,7 +346,7 @@ function ChatList({ socket }: { socket: any }) {
         </TopMenu> */}
       </TitleBox>
       <ContentBox>
-        {rooms.map((room) => (
+        {rooms?.map((room) => (
           <RoomList
             key={room.room_id}
             $isSelected={selectedId === room.room_id}
@@ -296,6 +357,7 @@ function ChatList({ socket }: { socket: any }) {
                 () => roomListDbClick(room.room_id)
               )
             }
+            onContextMenu={(event) => handleContextMenu(event, room)}
           >
             <ImgBox $length={room.images.length}>
               {room.images.map((img, i) => (
@@ -305,6 +367,7 @@ function ChatList({ socket }: { socket: any }) {
             <TextBox>
               <LeftBox>
                 <Title>
+                  {room.type == 'alone' && <Me>나</Me>}
                   <Names>
                     {/* {room.names.map((name, j) =>
                       j >= 0 && j >= room.names.length - 1 ? name : name + ','
@@ -318,7 +381,7 @@ function ChatList({ socket }: { socket: any }) {
                 <LastMsg>{room.last_message}</LastMsg>
               </LeftBox>
               <DateBox>
-                <LastMsgDate>{room.last_message_created_at}</LastMsgDate>
+                <LastMsgDate>{room.last_message_date}</LastMsgDate>
                 <ReadNotCount $isCount={room.read_n_count ? true : false}>
                   {room.read_n_count}
                 </ReadNotCount>
@@ -327,6 +390,14 @@ function ChatList({ socket }: { socket: any }) {
           </RoomList>
         ))}
       </ContentBox>
+      {isContextMenuOpen && (
+        <ContextMenu
+          top={contextMenuPosition.top}
+          left={contextMenuPosition.left}
+          options={contextMenuOptions}
+          onClose={() => setIsContextMenuOpen(false)}
+        />
+      )}
       {openModal === 'room' && (
         <ChattingRoom
           handleCloseModal={handleCloseModal}

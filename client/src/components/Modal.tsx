@@ -30,7 +30,7 @@ const Content = styled.div`
   }
 
   @media (min-width: 1000px) {
-    width: 40%;
+    width: 70%;
   }
 
   /* 1200px 이상일 때 (일반 모니터 사이즈 기준) */

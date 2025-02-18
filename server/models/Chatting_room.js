@@ -19,9 +19,8 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true, // 자동 증가 옵션이 필요하다면 추가
       },
       type: DataTypes.STRING(20),
-      room_name: DataTypes.STRING(200),
-      last_message: DataTypes.STRING(200),
-      last_message_created_at: DataTypes.DATE,
+      room_uuid: DataTypes.STRING(50),
+      deletedAt: DataTypes.DATE,
     },
 
     {

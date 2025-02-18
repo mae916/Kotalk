@@ -45,9 +45,9 @@ const Count = styled.div`
   padding: 2px 0;
 `;
 
-const Icon = styled.i<{ isActive: boolean }>`
+const Icon = styled.i<{ $isActive: boolean }>`
   font-size: 1.5rem;
-  color: ${({ isActive }) => (isActive ? '#5f5f5f' : '#c9c9c9')};
+  color: ${({ $isActive }) => ($isActive ? '#5f5f5f' : '#c9c9c9')};
 `;
 
 const LogoutIcon = styled.i`
@@ -146,7 +146,7 @@ function SideMenu({ readNotCount }: { readNotCount: number }) {
                 pathname: `/friends`,
               }}
             >
-              <Icon isActive={isFriendsPage} className="xi-user"></Icon>
+              <Icon $isActive={isFriendsPage} className="xi-user"></Icon>
             </Link>
           </li>
           <li>
@@ -155,7 +155,7 @@ function SideMenu({ readNotCount }: { readNotCount: number }) {
                 pathname: `/chatList`,
               }}
             >
-              <Icon isActive={isChatListPage} className="xi-speech"></Icon>
+              <Icon $isActive={isChatListPage} className="xi-speech"></Icon>
             </Link>
             {readNotCount > 0 && <Count>{readNotCount}</Count>}
           </li>
@@ -165,7 +165,7 @@ function SideMenu({ readNotCount }: { readNotCount: number }) {
                     pathname: `/more`,
                   }}
                 >
-                  <Icon isActive={isMorePage} className="xi-ellipsis-h" ></Icon>
+                  <Icon $isActive={isMorePage} className="xi-ellipsis-h" ></Icon>
                 </Link>
               </li> */}
         </ul>

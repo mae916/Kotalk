@@ -19,11 +19,14 @@ export const participantState = atom<ChatRoom>({
   default: {
     images: [],
     last_message: '',
-    last_message_created_at: '',
+    last_message_date: '',
     names: [],
     room_id: 0,
-    ids: [],
+    user_ids: [],
     room_name: '',
+    room_uuid: '',
     read_n_count: 0,
+    type: '',
+    room_key: '',
   },
 });

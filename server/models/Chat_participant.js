@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       room_id: DataTypes.INTEGER,
       user_id: DataTypes.INTEGER,
-      friend_id: DataTypes.INTEGER,
+      leftAt: DataTypes.DATE,
     },
     {
       sequelize,

@@ -56,13 +56,15 @@ export async function getReadNotCount(req, res) {
           FROM chat_participant cp
           LEFT JOIN msg_read_user mru 
               ON mru.room_id = cp.room_id 
-              AND mru.read_yn = 'n' 
+              AND mru.read_yn = 'n' AND cp.leftAt IS NULL 
               AND mru.user_id = ?
           WHERE cp.user_id = ?
           GROUP BY cp.room_id
       ) sub`,
       [userId, userId]
     );
+
+    console.log('getReadNotCount result',result);
 
     if (result.length === 0) {
       return res.status(204).json({ message: '정보가 존재하지 않습니다.' });
@@ -85,6 +87,8 @@ export async function getChattingList(req, res) {
 
   try {
     const result = await getRoomInfoList(userId);
+
+    console.log('result',result);
 
     if (result.length === 0) {
       return res.status(204).json({ message: '정보가 존재하지 않습니다.' });

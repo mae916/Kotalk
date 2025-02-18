@@ -37,8 +37,8 @@ export async function isParticipantRoomExist(users, type) {
 
   const rooms = await db.sequelize.query(
     `SELECT cp.room_id
-      FROM Chat_participant AS cp
-      JOIN Chatting_room AS cr ON cp.room_id = cr.room_id
+      FROM chat_participant AS cp
+      JOIN chatting_room AS cr ON cp.room_id = cr.room_id
       WHERE cp.user_id IN (:users) 
         AND cr.type = :type
         AND cr.deletedAt IS NULL
@@ -127,7 +127,7 @@ export async function getRoomInfo(roomIds) {
             GROUP BY room_id
         )
     ) AS c ON c.room_id = cr.room_id
-    WHERE cr.room_id IN (:roomIds)
+    WHERE cr.room_id IN (:roomIds) AND cp.leftAt IS NULL
     GROUP BY cr.room_id, cr.room_uuid, cr.type`,
     {
       replacements: { roomIds },
@@ -153,7 +153,6 @@ export async function getRoomInfoList(userId) {
         FROM chat_participant
         WHERE user_id = :userId
     ) 
-    AND cp.user_id = :userId
     AND cp.leftAt IS NULL
     GROUP BY cr.room_id, cr.room_uuid, cr.type;
 `,
@@ -172,32 +171,28 @@ export async function getLatestChatting(userId, roomIds) {
   console.log('roomIds', roomIds);
   const chattings = await db.sequelize.query(
     `SELECT 
-        ch.room_id, 
-        ch.message, 
-        ch.createdAt
-    FROM chatting AS ch
-    LEFT JOIN chat_participant AS cp 
-        ON ch.room_id = cp.room_id 
-        AND ch.user_id = cp.user_id
-    WHERE cp.user_id = :userId
-      AND cp.room_id IN (:roomIds)
-      AND cp.leftAt IS NULL
-      AND (ch.room_id, ch.createdAt) IN (
-            SELECT 
-                chatting.room_id, 
-                MAX(chatting.createdAt) 
-            FROM chatting
-            LEFT JOIN chat_participant AS part
-                ON chatting.room_id = part.room_id
-            WHERE part.leftAt IS NULL
-              AND chatting.createdAt > (
-                  SELECT MAX(createdAt)
-                  FROM chat_participant AS part 
-                  WHERE part.leftAt IS NULL
-                  AND part.room_id = chatting.room_id
-              )
-            GROUP BY chatting.room_id
-        );`,
+          chatting.room_id, 
+          ANY_VALUE(chatting.message) AS message, 
+          MAX(chatting.createdAt) AS createdAt
+      FROM chatting
+      LEFT JOIN chat_participant AS part
+          ON chatting.room_id = part.room_id
+      WHERE part.leftAt IS NULL
+        AND chatting.room_id IN (:roomIds)
+        AND chatting.createdAt = (
+            SELECT MAX(createdAt)
+            FROM chatting AS c
+            WHERE c.room_id = chatting.room_id
+        )
+        AND chatting.createdAt > (
+            SELECT MAX(createdAt)
+            FROM chat_participant AS part 
+            WHERE part.user_id = :userId
+              AND part.room_id = chatting.room_id
+              AND part.leftAt IS NULL
+        )
+      GROUP BY chatting.room_id;
+      `,
     {
       replacements: { userId, roomIds },
       type: db.Sequelize.QueryTypes.SELECT,

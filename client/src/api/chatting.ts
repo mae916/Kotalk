@@ -45,7 +45,6 @@ export async function getChatRoomInfoAxios(userId: number, roomId: number) {
 // 개인채팅방 생성 혹은 조회
 export async function enterRoomAxios(users: number[]) {
   try {
-    console.log('users', users);
     const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/chatting/enterRoom`,
       { users },

@@ -161,7 +161,6 @@ function Friends({ socket }: any) {
       const { data } = await getFriendsListAxios(user.user_id);
       setFriends(data);
 
-      console.log('getFriendList', data);
     } catch (error) {
       console.error('친구 목록 조회 실패:', error);
     }
@@ -187,7 +186,6 @@ function Friends({ socket }: any) {
       user.user_id,
       room_id
     );
-    console.log('Friends roomInfo', roomInfo);
     setParticipant(roomInfo);
     handleOpenModal('chatting');
   }

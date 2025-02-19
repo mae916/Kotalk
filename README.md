@@ -109,7 +109,7 @@
 ![친구 찾기 및 추가](server/assets/readme/addFriend.png)
 
 ### 나와의 채팅
-  ![나와의 채팅](server/assets/readme/aloneChat.png)
+![나와의 채팅](server/assets/readme/aloneChat.png)
 
 ### 1:1 실시간 채팅 & 메시지 읽음 처리
 메시지 창이 포커스 되어야 읽음 처리 가능 합니다.
@@ -122,5 +122,5 @@
 ![메시지 삭제](server/assets/readme/delMsg.png)
   
 ### 프로필 사진 변경
- ![프로필 사진 변경](server/assets/readme/profileSetting.png)
+![프로필 사진 변경](server/assets/readme/profileSetting.png)
 

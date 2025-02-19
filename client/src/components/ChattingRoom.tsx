@@ -301,7 +301,6 @@ type ChattingRoomProps = {
 };
 
 function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
-  console.log('ChattingRoom 렌더링');
   const user = useRecoilValue<any>(userState);
   const participant = useRecoilValue(participantState);
   const [msgList, setMsgList] = useState<any>([]);
@@ -367,14 +366,12 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
 
       //이미 포커스가 돼있는 경우 실행 시키기
       if (document.hasFocus()) {
-        console.log('hasFocus');
         handleFocus();
       }
 
       window.addEventListener('focus', handleFocus);
       window.addEventListener('blur', handleBlur);
     } else {
-      console.log('socket 조건충족 안됨');
     }
     return () => {
       window.removeEventListener('focus', handleFocus);
@@ -387,7 +384,6 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
   useEffect(() => {
     // inView 가 true 일때 리스트를 업데이트
     if (inView) {
-      console.log('inview');
       setHasMore(true);
       getPrevScroll();
       fetchChatList();
@@ -398,7 +394,6 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
     if (!isFetching) return; // getChattingList가 실행된 경우만 실행
     handleScrollPosition();
     setIsFetching(false);
-    console.log('msgList', msgList);
   }, [msgList]);
 
   async function fetchChatList() {
@@ -426,9 +421,7 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
   }
 
   function handleFocus() {
-    console.log('socket, roomName', socket, roomName);
     if (socket && roomName) {
-      console.log('포커스 인');
       setVisible(true);
       socket.emit('read_message', participant.room_id, roomName, user.user_id);
       updateReadUser(user.user_id);
@@ -436,7 +429,6 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
   }
 
   function handleBlur() {
-    console.log('포커스 아웃');
     setVisible(false);
   }
 
@@ -452,17 +444,12 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
   }
 
   async function getChattingList() {
-    console.log('getChattingList');
-    console.log('lastChatId', lastChatId);
     const data = await getMsgListAxios(
       participant.room_id,
       user.user_id,
       pageSize,
       lastChatId
     );
-    console.log('getChattingList data', data);
-    console.log('getChattingList hasMore', hasMore);
-    console.log('getChattingList inView', inView);
 
     if (!data) {
       if (hasMore) {
@@ -487,7 +474,6 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
   }
 
   function formattingMsg(author: any, message: string) {
-    console.log('visiblevisible', visible);
     const obj = {
       message,
       del_yn: 'n',
@@ -516,13 +502,11 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
     });
 
     //내가 보낸 메시지의 경우에만 스크롤을 아래로 내림
-    console.log(msgData);
     if (msgData.user_id === user.user_id) {
       setIsFetching(true);
       setPrevScroll(null);
     } else {
       if (scrollRef.current) {
-        console.log('scrollRef', scrollRef);
         if (
           scrollRef.current.scrollHeight - scrollRef.current.scrollTop >
           1500
@@ -543,7 +527,6 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
     if (roomName && socket) {
       const obj = formattingMsg(user, data.message);
       socket.emit('send_msg', roomName, obj); // 메시지 전송
-      console.log(roomName, socket);
       reset(); // 입력창 초기화
     } else {
       console.error('소켓 연결 실패');
@@ -567,15 +550,12 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
     const threeMinutesLater = new Date(givenTime.getTime() + 3 * 60 * 1000);
 
     // 주어진 시간이 현재 시간으로부터 3분 후인지 비교
-    console.log('threeMinutesLater', threeMinutesLater);
-    console.log('currentTime', currentTime);
     return currentTime <= threeMinutesLater;
   }
 
   function handleContextMenu(event: React.MouseEvent<HTMLElement>, msg: any) {
     event.preventDefault();
     const isThreeMinutes = createAtTimeCheck(msg.createdAt);
-    console.log('isThreeMinutes', isThreeMinutes);
 
     if (msg.user_id == user.user_id && isThreeMinutes && msg.del_yn == 'n') {
       //본인이 쓴 메시지고, 작성후 3분이내이고, 삭제된적 없는 메시지일때
@@ -622,7 +602,6 @@ function ChattingRoom({ handleCloseModal, socket }: ChattingRoomProps) {
       onClick: deleteMessage,
     },
   ];
-  console.log('participant chattingroom', participant);
   return (
     <Modal>
       <Container>

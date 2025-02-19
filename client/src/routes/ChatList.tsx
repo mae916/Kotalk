@@ -227,7 +227,6 @@ const Me = styled.div`
 `;
 
 function ChatList({ socket }: { socket: any }) {
-  console.log('ChatList 렌더링');
   const user = useRecoilValue<IUserAtom>(userState);
   const setParticipant = useSetRecoilState<ChatRoom>(participantState);
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
@@ -256,20 +255,16 @@ function ChatList({ socket }: { socket: any }) {
   }, []);
 
   async function getChattingList() {
-    console.log('chartList getChattingList', user.user_id);
     const { data } = await getChattingListAxios(user.user_id);
 
     if (data && JSON.stringify(data) !== JSON.stringify(rooms)) {
       //기존 rooms와 값이 다를때만 setRooms 호출(불필요한 재렌더링 줄이기)
       setRooms(data);
-      console.log('data', data);
     }
   }
 
   async function getReadNotMsgList() {
-    console.log('chartList getReadNotMsgList', user.user_id);
     const { data } = await getReadNotMsgListAxios(user.user_id);
-    console.log('rooms', rooms);
 
     setRooms((prevRooms) => {
       const newRooms = prevRooms.map((room) => {

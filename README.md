@@ -24,7 +24,7 @@
 
 ## 🚀 배포 링크
 
-**[https://talko.jinproject.xyz/login](https://talko.jinproject.xyz/login)**
+**[https://kotalk.jinproject.xyz/login](https://kotalk.jinproject.xyz/login)**
 
 ### 테스트 계정
 

@@ -24,7 +24,7 @@
 
 ## 🚀 배포 링크
 
-**[https://katalk.jinproject.xyz/login](https://katalk.jinproject.xyz/login)**
+**[https://talko.jinproject.xyz/login](https://talko.jinproject.xyz/login)**
 
 ### 테스트 계정
 
